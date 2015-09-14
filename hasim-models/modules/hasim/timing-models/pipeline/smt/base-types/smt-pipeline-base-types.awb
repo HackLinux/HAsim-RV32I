@@ -1,0 +1,13 @@
+%AWB_START
+
+%name SMT Pipeline Base Types
+%desc SMT Pipeline Base Types
+%provides pipeline_base_types
+
+%attributes hasim model pipeline inorder smt
+
+%public smt-pipeline-base-types.bsv
+
+%param MAX_NUM_THREADS_PER_CORE 2 "Maximum number of HW threads supported per core."
+
+%AWB_END

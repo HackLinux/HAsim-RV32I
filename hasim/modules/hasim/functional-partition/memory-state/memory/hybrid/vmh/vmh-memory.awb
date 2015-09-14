@@ -1,0 +1,12 @@
+
+%name VMH hybrid memory
+%desc VMH hybrid memory
+
+%provides funcp_simulated_memory
+
+%sources -v PUBLIC   vmh-memory.h
+%sources -v PRIVATE  vmh-memory.cpp
+%sources -v PRIVATE  vmh-utils.cpp
+%sources -v PUBLIC   vmh-utils.h
+
+%param PROGRAM_START_ADDR 4096          "Address where model should start fetching"

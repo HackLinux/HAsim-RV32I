@@ -1,0 +1,16 @@
+
+%name FPGA1 Simulation Physical Platform
+%desc FPGA1 Simulation Physical Platform
+
+%provides physical_platform
+
+%requires clocks_device physical_platform_utils simulation_communication_device
+
+%sources --t BSV --v PUBLIC  sim-physical-platform-fpga1.bsv
+%sources --t H   --v PUBLIC  sim-physical-platform-fpga1.h
+%sources --t CPP --v PRIVATE sim-physical-platform-fpga1.cpp
+%sources --t BSH --v PUBLIC  sim-physical-platform-fpga1.bsh
+
+
+
+

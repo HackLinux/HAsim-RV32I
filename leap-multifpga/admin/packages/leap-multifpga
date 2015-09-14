@@ -1,0 +1,10 @@
+
+[Global]
+Buildorder=1000
+Version=1
+Lock=asim-multifpga
+Description=Description of multifpga
+Name=leap-multifpga
+Tag=14.08
+Prerelease=1
+CSN=CSN-multifpga-258

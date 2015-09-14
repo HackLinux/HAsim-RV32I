@@ -1,0 +1,12 @@
+%name Cryptosorter Banked Memory Wrapper
+%desc converts the scratchpad abstraction to the memory abstraction expected by the cryptosorter
+
+%provides cryptosorter_memory_wrapper
+
+%public  ExternalMemoryBanked.bsv
+%public  memory.dic
+
+
+
+
+

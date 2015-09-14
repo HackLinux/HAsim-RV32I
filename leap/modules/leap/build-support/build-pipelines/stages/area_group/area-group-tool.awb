@@ -1,0 +1,20 @@
+%name Area Group Tool
+%desc Area Group Tool
+%attributes tool
+
+%provides area_group_tool
+%requires area_group_parser
+
+%scons %library area_group_tool.py
+%scons %library tsp.py
+
+%param --global AREA_GROUPS_ENABLE 0 "True if we should emit/build area groups."
+%param AREA_GROUPS_CHANNEL_BUFFERING_ENABLE 1 "True if buffers should be added to inter-module LI channels to enable timing closure."
+%param AREA_GROUPS_GROUP_PLATFORM_CODE 0 "True if we should build an area group for the platform code."
+%param AREA_GROUPS_PAR_DEVICE_AG 0 "True if we should build user-specified device area groups?"
+%param AREA_GROUPS_ROUTE_AG 0 "True if we should also route area groups."
+%param AREA_GROUPS_CLUSTERING_WEIGHT 0 "Basic weight to use when forcing area groups to be close to one another."
+%param AREA_GROUPS_ENABLE_PARENT_CLUSTERING 1 "Enables parent/child clustering in objective function."
+%param AREA_GROUPS_ENABLE_COMMUNICATION_CLUSTERING 1 "Enables communication-based clustering in objective function."
+
+

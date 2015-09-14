@@ -1,0 +1,12 @@
+%name Cryptosorter Memory Wrapper
+%desc converts the scratchpad abstraction to the memory abstraction expected by the cryptosorter
+
+%provides cryptosorter_memory_wrapper
+
+%public  ExternalMemory.bsv
+%public  memory.dic
+
+
+
+
+

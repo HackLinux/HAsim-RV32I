@@ -1,0 +1,11 @@
+*.b[ioa]
+a.out*
+mk*
+schedule*
+*.vcd
+*.out
+vpi_*
+*.o
+simdir
+*BDPI*
+FIFOUtility.bsv

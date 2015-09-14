@@ -1,0 +1,7 @@
+service MEMORY_RRR
+{
+    server sw (cpp, method) <- hw (bsv, connection) 
+    {
+        method MemResp (in UINT64[64] mesg);
+    };
+}

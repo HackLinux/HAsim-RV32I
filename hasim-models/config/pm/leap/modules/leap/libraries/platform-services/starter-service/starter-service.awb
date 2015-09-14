@@ -1,0 +1,15 @@
+%name Starter Service
+%desc Starter Service
+
+%provides starter_service
+
+%attributes hybrid connected
+
+%notes README
+
+%public starter-service.bsv
+%public starter-service.cpp
+%public starter-service.rrr
+%public starter-service.h
+%sources -t LOG -v PUBLIC     starter-service.log
+

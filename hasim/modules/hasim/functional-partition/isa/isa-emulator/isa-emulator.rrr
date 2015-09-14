@@ -1,0 +1,68 @@
+#include "asim/provides/hasim_common.h"
+#include "asim/provides/funcp_base_types.h"
+#include "asim/provides/isa_emulator.h"
+
+service ISA_EMULATOR
+{
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        // Copy a register from FPGA to host in preparation for emulation
+        method sync(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                    in REG_NAME_RRR[16] rName,
+                    in ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] rValue);
+
+        // Full instruction emulation with possible memory or I/O side
+        // effects
+        method emulate(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                       in INSTRUCTION_RRR[32] instr,
+                       in ISA_ADDRESS[FUNCP_ISA_V_ADDR_SIZE] pc,
+                       out ISA_ADDRESS[FUNCP_ISA_V_ADDR_SIZE] newPc);
+    };
+
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+        // Update an FPGA-side register value following emulate() above.
+        method updateRegister(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                              in REG_NAME_RRR[16] rName,
+                              in ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] rValue);
+    };
+};
+
+
+service ISA_REGOP_EMULATOR
+{
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        // Emulate an instruction that is guaranteed not to have any
+        // memory, I/O or faulting side effects.
+        method emulateRegOp(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                            in INSTRUCTION_RRR[32] instr,
+                            in ISA_ADDRESS[FUNCP_ISA_V_ADDR_SIZE] pc,
+                            in ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] srcVal0,
+                            in ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] srcVal1,
+                            in REG_NAME_RRR[16] rNameSrc0,  // Source arch. register
+                            in REG_NAME_RRR[16] rNameSrc1,
+                            in REG_NAME_RRR[16] rNameDst,   // Dest arch. register
+                            out ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] dstVal);
+    };
+};
+
+
+//
+// Not emulation, but a convenient place for a debug stream coming from the
+// hardware.
+//
+service ISA_DP_DEBUG
+{
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        //
+        // Pass instruction and input state to host.
+        //
+        method noteInstr(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                         in INSTRUCTION_RRR[32] instr,
+                         in ISA_ADDRESS[FUNCP_ISA_V_ADDR_SIZE] pc,
+                         in ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] srcVal0,
+                         in ISA_VALUE[FUNCP_ISA_INT_REG_SIZE] srcVal1);
+    };
+};

@@ -1,0 +1,12 @@
+%name Standard I/O Services Null
+%desc Standard I/O Services Null
+
+%provides stdio_service
+
+%attributes hybrid connected
+
+%notes README
+
+%public stdio-local.bsv 
+
+%param --global STDIO_ENABLE_DEBUG   0  "Enable debugging nodes"

@@ -1,0 +1,6 @@
+// Scratchpads
+def VDEV.SCRATCH.MATRIX_A     "matrix_multiply_matrix_A";
+def VDEV.SCRATCH.MATRIX_B     "matrix_multiply_matrix_B";
+def VDEV.SCRATCH.MATRIX_C     "matrix_multiply_matrix_C";
+def VDEV.SCRATCH.MATRIX_GOLD  "matrix_multiply_matrix_C_golden_answer";
+

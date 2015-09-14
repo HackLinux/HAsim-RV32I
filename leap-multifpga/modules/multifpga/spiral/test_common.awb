@@ -1,0 +1,14 @@
+%AWB_START
+
+%name Configurable Spiral common
+%desc Configurable Spiral common
+
+%provides test_common
+
+%sources -t BSV    -v PUBLIC  test-common.bsv
+%sources -t BDPI_H -v PUBLIC  test-common-bdpi.h
+%sources -t BDPI_C -v PRIVATE test-common-bdpi.c
+
+%generated -t BA delay.ba
+
+%AWB_END

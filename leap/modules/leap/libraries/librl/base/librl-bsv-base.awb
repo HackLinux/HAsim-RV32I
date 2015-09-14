@@ -1,0 +1,38 @@
+%name RL Bluespec Base Library
+%desc Reconfigurable Logic Bluespec Base Library
+
+%provides librl_bsv_base
+
+%attributes librl
+
+%notes README
+
+%public bluespec-def.bsv
+%public crc.bsv
+%public compress.bsv
+%public counters.bsv
+%public debug-file.bsv
+%public debug-sim.bsv
+%public extends.bsv
+%public fifo-delay.bsv
+%public fifo-functions.bsv
+%public fifo-marshaller.bsv
+%public fifo-merge.bsv
+%public fifo-peekable.bsv
+%public getput-extensions.bsv
+%public guarded-pipelines.bsv
+%public hash-bits.bsv
+%public hash-compile-time.bsv
+%public lfsr.bsv
+%public lists.bsv
+%public local-arbiters.bsv
+%public memory-init.bsv
+%public memory-interface.bsv
+%public memory-mapping.bsv
+%public memory-misc.bsv
+%public memory-pack.bsv
+%public register.bsv
+%public valid.bsv
+
+%include --type=verilog @BLUESPECDIR@/Verilog
+%include --type=verilog @BLUESPECDIR@/Libraries

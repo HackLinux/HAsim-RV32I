@@ -1,0 +1,14 @@
+%name Cryptosorter Sort Tree
+%desc Actual sort tree
+
+%provides cryptosorter_sort_tree
+%requires multifpga_switch
+
+%public  Sort.bsv BRAMLevel3Merger.bsv  BRAMLevel5Merger.bsv  BRAMLevel7Merger.bsv  SortTree64.bsv  BRAMLevel2Merger.bsv  BRAMLevel4Merger.bsv  BRAMLevel6Merger.bsv  Level1Merger.bsv 
+
+
+
+
+
+
+

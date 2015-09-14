@@ -1,0 +1,74 @@
+
+[Global]
+SaveParameters=0
+Description=Traffic Light from Bluespec Tutorial for ACP w. synthesis boundary
+File=cryptosorter_exe
+Version=2.2
+Name=Traffic Light Model - ACP with synthesis boundary
+DefaultBenchmark=config/bm/leap/demos.cfx/benchmarks/null.cfg
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Pipeline Build
+RootProvides=model
+
+[Model]
+DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project
+model=HW/SW Hybrid Pipeline Build
+
+[HW/SW Hybrid Pipeline Build]
+File=modules/leap/build-support/project/project-pipeline.awb
+Packagehint=leap
+
+[HW/SW Hybrid Pipeline Build/Requires]
+project_common=Default Hybrid Project Common Utilities
+fpgaenv=Hybrid Simulation FPGA Environment
+application_env=Soft Services Hybrid Application Environment
+
+[Soft Services Hybrid Application Environment]
+File=modules/leap/build-support/project/application-env/soft-services/application-env-hybrid-soft-service.awb
+Packagehint=leap
+
+[Soft Services Hybrid Application Environment/Requires]
+connected_application=Cryptosorter application
+
+[Default Hybrid Project Common Utilities]
+File=config/pm/leap/submodels/common/project-common-default.apm
+Packagehint=leap
+
+[Hybrid Simulation FPGA Environment]
+File=config/pm/leap/submodels/fpgaenv/fpgaenv-hybrid-exe.apm
+Packagehint=leap
+
+[Cryptosorter application/Requires]
+cryptosorter_common=Cryptosorter common files
+cryptosorter_sort_tree=Cryptosorter Sort Tree
+cryptosorter_memory_wrapper=Cryptosorter Memory Wrapper
+cryptosorter_control=Cryptosorter Top level control
+
+[Cryptosorter common files]
+File=modules/cryptosorter/Common/common.awb
+Packagehint=mmm
+
+[Cryptosorter application]
+File=modules/cryptosorter/Sorter/connected-application-test.awb
+Packagehint=mmm
+
+[Cryptosorter Sort Tree]
+File=modules/cryptosorter/SortTree/sort_tree.awb
+Packagehint=mmm
+
+[Cryptosorter Top level control]
+File=modules/cryptosorter/ctrl/control.awb
+Packagehint=mmm
+
+[Cryptosorter Memory Wrapper]
+File=modules/cryptosorter/ExternalMemory/external_memory.awb
+Packagehint=mmm
+
+[Cryptosorter Sort Tree/Requires]
+multifpga_switch=MultiFPGA Switch with Flowcontrol
+
+[MultiFPGA Switch with Flowcontrol]
+File=modules/leap/virtual-platform/virtual-devices/devices/multifpga_router_service/flowcontrol/flowcontrol-switch.awb
+Packagehint=multifpga

@@ -1,0 +1,53 @@
+#/********************************************************************
+#* Awb module specification
+#********************************************************************/
+
+%name HW/SW Hybrid Pipeline Build
+%desc HW/SW Hybrid Pipeline Build
+%attributes hybrid project
+
+%provides model
+
+%requires application_env 
+%requires fpgaenv
+%requires project_common
+
+%notes README
+
+%public  project-hybrid-main.bsv
+%public  project-hybrid-main.h
+%private project-hybrid-main.cpp
+%public  project-hybrid-init.h
+%private project-hybrid-init.cpp
+%public  hardware-done.h
+%public  project-utils.h
+%private project-utils.cpp
+
+%library lib/libasim/libasim.a
+%syslibrary pthread
+%syslibrary dl
+%syslibrary z
+%syslibrary rt
+
+%makefile Makefile.top.template
+%scons %main    SConstruct.top.template
+%scons %top     SCons.top.pipeline.template
+%scons %library ModuleList.py
+%scons %library Module.py
+%scons %library AWBParams.py
+%scons %library PythonTidy.py
+%scons %library Source.py
+%scons %library Utils.py
+%scons %library CommandLine.py
+%scons %library ProjectDependency.py
+%scons %sw      SCons.sw.pipeline.template
+%scons %iface   SCons.iface.template
+
+%param LEAP_DEBUG_PATH        "leap_debug"       "Debugging output directory"
+%param LEAP_BUILD_CACHE_DIR   ""                 "Where scons should put the build cache"
+%param LEAP_LIVE_DEBUG_PATH   "leap_debug/live"  "Live files (e.g. FIFOs) debugging output directory"
+%param SMART_SYNTH_BOUNDARY   0        "use smart synthesis boundaries"
+%param SYNTH_BOUNDARY          mkModel  "name of synthesis boundary"
+%param INSTANTIATE_ROUTERS 0        "use smart synthesis boundaries"
+
+%param WAIT_FOR_HARDWARE      1         "1 = SW application waits for done signal from hardware."

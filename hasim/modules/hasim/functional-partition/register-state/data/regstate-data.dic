@@ -1,0 +1,16 @@
+def ASSERTIONS.REGSTATE.FREELIST.OUT_OF_PREGS "FREELIST: Ran out of Physical Registers!";
+def ASSERTIONS.REGSTATE.FREELIST.REQUEST_NOT_ACTIVE "FREELIST: Got a null request before current request was filled!";
+
+def ASSERTIONS.REGSTATE.SCOREBOARD.OUT_OF_TOKENS "FUNCP: Ran out of Tokens!";
+def ASSERTIONS.REGSTATE.SCOREBOARD.REALLOCATE "FUNCP: Allocating an already-allocated Token!";
+def ASSERTIONS.REGSTATE.SCOREBOARD.COMMIT_POISON_INSTR "FUNCP: Attempt to commit poisoned instruction!";
+def ASSERTIONS.REGSTATE.SCOREBOARD.COMMIT_STORE_LIFETIME "FUNCP: Commit store token lifetime overlaps lifetime of next token with same ID or alias ID!";
+def ASSERTIONS.REGSTATE.SCOREBOARD.ILLEGAL_STORE_TOKEN  "FUNCP: Attempt to allocate store token for token that isn't a store or store not finished!";
+
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_ITRANS  "FUNCP: Finishing ITranslate on token that hasn't started.";
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_FETCH   "FUNCP: Finish Fetch on token that hasn't started.";
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_DECODE  "FUNCP: Finish Decode on token that hasn't started.";
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_EXECUTE "FUNCP: Finish Execute on token that hasn't started.";
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_DTRANS  "FUNCP: Finish DTranslate on token that hasn't started.";
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_LOAD    "FUNCP: Finish Loads on token that hasn't started.";
+def ASSERTIONS.REGSTATE.SCOREBOARD.FINISH_STORE   "FUNCP: Finish Stores on token that hasn't started.";

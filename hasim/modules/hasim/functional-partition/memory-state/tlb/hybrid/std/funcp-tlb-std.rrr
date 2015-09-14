@@ -1,0 +1,28 @@
+#include "asim/provides/hasim_common.h"
+#include "asim/provides/funcp_base_types.h"
+
+// Temporary hack until RRR has a type system
+#define FUNCP_ISA_P_ADDR_SIZE_RRR 64
+
+service FUNCP_TLB
+{
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        // Used in response to a fault.  Trigger activation of a virtual
+        // address for which no translation exists.
+        //
+        // *** Method must be first to get highest RRR static priority. ***
+        //
+        method ActivateVAddr(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                             in MEM_VALUE[FUNCP_ISA_INT_REG_SIZE] va,
+                             in UINT8[8] isITranslate);
+
+        method VtoP(in CONTEXT_ID_RRR[CONTEXT_ID_BITS_RRR] ctxId,
+                    in MEM_VALUE[FUNCP_ISA_INT_REG_SIZE] va,
+                    in UINT8[8] reqWordIdx,
+                    out FUNCP_PADDR_RRR[FUNCP_ISA_P_ADDR_SIZE_RRR] pa0,
+                    out FUNCP_PADDR_RRR[FUNCP_ISA_P_ADDR_SIZE_RRR] pa1,
+                    out FUNCP_PADDR_RRR[FUNCP_ISA_P_ADDR_SIZE_RRR] pa2,
+                    out FUNCP_PADDR_RRR[FUNCP_ISA_P_ADDR_SIZE_RRR] pa3);
+    };
+};

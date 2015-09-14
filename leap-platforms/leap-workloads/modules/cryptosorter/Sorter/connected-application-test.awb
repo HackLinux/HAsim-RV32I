@@ -1,0 +1,23 @@
+%name Cryptosorter application
+%desc Cryptosorter, based around merge sort
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%requires cryptosorter_common
+%requires cryptosorter_control
+%requires cryptosorter_sort_tree
+%requires cryptosorter_memory_wrapper
+
+%public  Sorter.bsv
+%public  connected-application-test.h
+%public  connected-application-test.cpp
+%public  SimpleController.rrr
+
+%library libglib-2.0.a
+%library libgthread-2.0.a
+%library librt.a
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

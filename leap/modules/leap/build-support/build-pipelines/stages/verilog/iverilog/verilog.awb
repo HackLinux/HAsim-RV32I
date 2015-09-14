@@ -1,0 +1,19 @@
+#/********************************************************************
+#* Python libraries for XST synthesis tool
+#********************************************************************/
+
+%name IVerilog Build Tool
+%desc Builds an iverilog model
+
+%attributes tool
+
+%provides verilog_tool
+
+%notes README
+
+%scons %library verilog.py
+
+%param ENABLE_SYSTEM_VERILOG  0 "Turn on iverilog system verilog flags (Experimental)"
+
+
+

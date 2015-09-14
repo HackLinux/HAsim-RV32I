@@ -1,0 +1,10 @@
+
+%name Base Common Devices
+%desc A collection of useful utilities, mostly dealing with I/O
+%provides common_utility_devices
+
+%notes README
+
+%sources -t H   -v PUBLIC  common-utility-devices.h
+%sources -t CPP -v PRIVATE common-utility-devices.cpp
+

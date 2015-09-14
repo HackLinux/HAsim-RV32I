@@ -1,0 +1,23 @@
+%name RRR-based Commands Service
+%desc Relays SW commands to HW modules.
+%provides commands_service
+%requires commands_local
+
+%attributes hasim hybrid
+
+%sources -t BSV -v PUBLIC  commands-service.bsv
+%sources -t BSH -v PUBLIC  commands-service.bsh
+%sources -t H   -v PUBLIC  commands-service.h
+%sources -t CPP -v PRIVATE commands-service.cpp
+%sources -t RRR -v PUBLIC  commands-service.rrr
+%sources -t LOG -v PUBLIC  commands-service.log
+
+%param SYNTH_BOUNDARY mkCommandsService  "Name of synthesis boundary"
+
+%param MODEL_COOLDOWN 2 "Number of FPGA cycles to run after simulation has finished to facilitate IO draining."
+
+%param --global HEARTBEAT_TRIGGER_BIT 13 "Transitions of this bit in the model cycle counter trigger heartbeat messages"
+
+# FPGA heartbeat is used for deadlock detection.  A trigger on bit 26 is about
+# one beat a second at typical FPGA frequencies.
+%param --global FPGA_HEARTBEAT_TRIGGER_BIT 26 "Transisions of this FPGA cycle counter triggers an FPGA heartbeat message"

@@ -1,0 +1,19 @@
+#/********************************************************************
+#* Generic FPGA build pipeline
+#********************************************************************/
+
+%name LEAP LI Module Handler
+%desc Various routines for constructing and manipulating LI Modules
+
+%provides li_module
+
+%scons %library liChannel.py
+%scons %library liChain.py
+%scons %library liGraph.py
+%scons %library liModule.py
+%scons %library liUtility.py
+
+
+
+
+

@@ -1,0 +1,17 @@
+%name Functional Partition Version 3
+%desc Functional Partition Version 3
+
+%provides hasim_funcp
+
+%requires funcp_base_types
+%requires funcp_interface
+%requires funcp_regstate
+%requires funcp_memstate
+%requires hasim_isa_semantics
+
+%attributes hasim funcp
+
+%public functional-partition-default.bsv
+%public functional-partition-default.h
+
+%param SYNTH_BOUNDARY mkFuncp "Name of synthesis boundary"

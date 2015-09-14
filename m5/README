@@ -1,0 +1,7 @@
+This repository holds the m5 (http://www.m5sim.org/) source tree used by HAsim.
+It is currently based on release 2.0b5.
+
+The original source tree is stored in the m5 subdirectory.  We modify that tree
+locally as little as possible to simplify moving to a new version.  HAsim ISA-
+specific libraries using m5 will build instances of m5 within their own
+source trees as part of the configure / build step.

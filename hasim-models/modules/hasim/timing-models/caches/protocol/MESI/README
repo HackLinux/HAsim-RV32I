@@ -1,0 +1,251 @@
+DATA STRUCTURES
+
+  Cache protocol messages passed throughout the hierarchy:
+
+    * REQ_LOAD: Read request
+        o exclusive flag: Shared (read-only) if false, write-intent if true
+        o opaque value (Level-dependent value.  Each level may update the value
+                        but must ultimately return the same value in a RSP_LOAD.)
+    * RSP_LOAD
+        o exclusive flag: Same as REQ_LOAD.
+        o opaque value (from REQ_LOAD)
+    * WB_INVAL: Write request
+        o exclusive flag: CPU owns the line (may be dirty and exclusive).
+        o dirty flag: Does the payload include dirty state?
+        o toDir flag: Is the message a response to a request from a lower
+          level cache?
+    * FORCE_INVAL: Force writeback, if necessary. The response to FORCE_INVAL is
+      a WB_INVAL with toDir set.
+        o fromDir: Request from directory controller
+
+
+NOTATION
+
+  In the following discussion:
+    - "o" prefix on a line represents a state transition
+    - Message/channel notation: <type>/<channel>, e.g. WB_INVAL/2
+
+
+CHANNELS
+
+  Three channels maintain ordering.  Channels 0 and 2 travel from L1 toward
+  the LLC.  Channel 2 is given higher priority than channel 0.  Channel 1
+  travels from the LLC toward the L1.  
+
+    0: REQ_LOAD
+    1: RSP_LOAD, FORCE_INVAL [ may block when channel 2 full ]
+    2: WB_INVAL [ never blocks ]
+
+
+PROTOCOLS
+
+L1I:
+
+States (stable):
+    * S: Present in this and, possibly, others.
+    * I: Invalid.
+States (transition):
+    * FILL: Fill request outstanding.
+
+Transitions:
+    * Processor READ:
+        * S: Immediate response HIT
+        o FILL
+          * If the request can be merged with the parent outstanding read
+            then immediate response MISS.
+          * If the request can NOT be merged then immediate response RETRY.
+        o Not present:  Pick a victim.
+          * No victim available:  Immediate response RETRY.
+          o I -> FILL:
+              REQ_LOAD/0 to L2 with not exclusive.
+              Immediate response MISS.
+          o S -> FILL:
+              WB_INVAL/2 toDir false, dirty false, exclusive false.
+              REQ_LOAD/0 to L2 with not exclusive.
+              Immediate response MISS.
+    * RSP_LOAD:
+        * {S, I, Not present}: ERROR
+        o FILL -> S:  Notify CPU fill complete
+    * FORCE_INVAL:
+        The I-cache currently sends no WB_INVAL response.  Doing so would force
+        the L2 to wait for a response from both the I and D caches, which would
+        complicate the algorithm.  Our run-time model never overwrites
+        instructions, so timing of FORCE_INVAL/WB_INVAL isn't really critical.
+
+        o S -> I
+        o FILL: No change (Fill must not have been received yet by the LLC.
+                           If it had, the RSP_LOAD would arrive before FORCE_INVAL.)
+        o Not present: No change
+
+
+L1D:
+
+States (stable):
+    * M: Present only here and dirty.
+    * E: Present only here and clean.
+    * S: Present in this and, possibly, others.
+    * I: Invalid.
+States (transition):
+    * FILL_S: Fill request outstanding (for shared).
+    * FILL_E: Fill request outstanding (for exclusive).
+    * S_E: S to E transition
+
+Transitions:
+    * Processor READ:
+        * {M, E, S, S_E}: Immediate response HIT
+        o {FILL_S, FILL_E}
+          * If the request can be merged with the parent outstanding read
+            then immediate response MISS.
+          * If the request can NOT be merged then immediate response RETRY.
+        o Not present: Pick a victim.
+          * No victim available:  Immediate response RETRY.
+          o {M, E, S} -> FILL_S:
+              WB_INVAL/2 toDir false, dirty if from M, exclusive if not from S.
+              REQ_LOAD/0 to L2 with not exclusive.
+              Immediate response MISS to CPU
+          o I -> FILL_S:
+              REQ_LOAD/0 to L2 with not exclusive.
+              Immediate response MISS to CPU
+          * Transition state: No action.
+    * Processor WRITE:
+        o M: Immediate response HIT
+        o E -> M: Immediate response HIT
+        o S -> S_E: REQ_LOAD/0 with exclusive to L2.
+                    Immediate response RETRY
+        o FILL_S -> FILL_E: REQ_LOAD/0 with exclusive to L2.
+                            Immediate response RETRY
+        * {FILL_E, S_E}: Immediate response RETRY
+        o Not present (pick a victim):  All immediate response RETRY to CPU.
+          * No victim available:  Immediate response RETRY.
+          o {M, E, S} -> FILL_E:
+              WB_INVAL/2 toDir false, dirty if from M, exclusive if not from S.
+              REQ_LOAD/0 to L2 with exclusive.
+          o I -> FILL_E:
+              REQ_LOAD/0 to L2 with exclusive.
+    * RSP_LOAD:
+        o {M, E, S, I}: ERROR
+        o FILL_S -> S: Notify CPU fill complete if load
+        o FILL_E -> {exclusive ? E : S_E}: Notify CPU fill complete if load
+        o S_E -> E: Error if RSP_LOAD ! exclusive,
+                    Notify CPU fill complete if load
+    * FORCE_INVAL:
+        o {M, E, S} -> I:
+            WB_INVAL/2 toDir copied from fromDir, dirty if from M,
+                                                  exclusive if not from S.
+        o {I, FILL_S, FILL_E}: No change
+            WB_INVAL/2 toDir copied from fromDir, dirty false, exclusive false.
+            (Line currently behaves as though it is invalid.  Fill request hasn't
+             been received by the directory but will still complete, later.)
+        o S_E -> FILL_E
+            WB_INVAL/2 toDir copied from fromDir, dirty false, exclusive false.
+            (Switching to FILL_E blocks future reads until the switch
+             to exclusive.)
+
+
+L2:
+
+  Note that the L2 is non-inclusive and populated as a victim cache.
+  A line may be present in the L1 without being present in the L2.
+  All FORCE_INVAL messages from the LLC must first be forwarded to the L1.
+  The L1 I-cache never responds to a FORCE_INVAL.  We use the response from
+  the L1 D-cache as a proxy for both halves.
+
+States (stable):
+    * M: Present only here or L1 and dirty.
+    * E: Present only here or L1 and clean.
+    * S: Present in this and, possibly, others.
+    * I: Invalid.
+
+Transitions:
+    * REQ_LOAD not exclusive:
+        * {M, E, S}: Hit (RSP_LOAD/1)
+        * I:
+            Forward REQ_LOAD/0 to LLC.
+    * REQ_LOAD exclusive:
+        * {M, E}: Hit (RSP_LOAD/1)
+        * I:
+            Forward REQ_LOAD/0 to LLC.
+    * WB_INVAL not toDir:
+        * M: Done
+        o E -> {dirty ? M : E}: Done
+        * S: Done.  ERROR if dirty or if exclusive.
+        o Not present:  Pick a victim
+          * Eviction based on current state:
+            * M
+                WB_INVAL/2 toDir false, dirty true, exclusive true.
+            * {E, S, I}: No action.
+          o -> {M if dirty, E if only exclusive, otherwise S}
+    * WB_INVAL toDir:
+        o {M, E, S, I} -> I
+            WB_INVAL/2 to LLC toDir true,
+                              dirty copied and set if state was M,
+                              exclusive copied and set if {M, E}.
+            ERROR if in S and incoming request has exclusive.
+    * RSP_LOAD:
+        o S -> {S, E}: Exclusive set if response has exclusive bit set.
+            RSP_LOAD/1 forward to L1.
+        * All others: Do not add to cache.  (L2 is a victim cache.)
+            RSP_LOAD/1 forward to L1.
+    * FORCE_INVAL:
+        * Forward FORCE_INVAL/1 to L1
+
+
+LLC:
+
+  There is no E state because the LLC will fill only due to a request from
+  the L2.  L1/L2 flushes aren't tracked, which would be needed to note LLC
+  transition back to E.  For similar reasons, there are no MI or SI states.
+
+States (stable):
+  The first letter in the state is the local state.  The second is the state
+  in L1/L2.
+    * SS: Present here and possibly in L1 or L2.
+    * MS: Modified here and possibly in shared state in L1 or L2.
+    * SM: Present here and possibly modified in some L1 or L2.
+    * MM: Modified here and possibly modified with newer value in some L1 or L2.
+    * I: Invalid.
+States (transition):
+    * S_INVAL: Invalidating shared copies of line in all L1 and L2 caches.
+    * M_INVAL: Invalidating line in L1 and L2.  Writeback required at completion.
+    * FILL_S: Fill request outstanding (for shared).
+    * FILL_E: Fill request outstanding (for exclusive).
+
+Transitions:
+    * REQ_LOAD not exclusive:
+        * {SS, MS}: No change (RSP_LOAD/1)
+        * {SM, MM}: No change (RSP_LOAD/1) *** FIXME ***
+        o Not present: Pick a victim.
+          * No victim available:  No action (retry)
+          * {MS, SM, MM}: Writeback to memory. *** FIXME ***
+          o {SS, MS, SM, MM, I} -> FILL_S (Load to memory) *** FIXME ***
+    * REQ_LOAD exclusive:
+        o SS -> SM: Hit (RSP_LOAD/1)
+        o MS -> MM: Hit (RSP_LOAD/1)
+        * SM -> MM: Hit (RSP_LOAD/1) *** FIXME ***
+        o {MM}: Hit (RSP_LOAD/1) *** FIXME ***
+        o Not present: Pick a victim.
+          * No victim available:  No action (retry)
+          * {MS, SM, MM}: Writeback to memory. *** FIXME ***
+          o {SS, MS, SM, MM, I} -> FILL_E (Load to memory) *** FIXME ***
+    * WB_INVAL: Forward to directory
+        o {I, FILL_S, FILL_E}: ERROR
+        o {SS, MS}: ERROR if dirty
+        o SM -> MM: Done
+        o S_INVAL -> M_INVAL: Done
+    * Memory load response:
+        o {SS, MS, SM, MM, I, S_INVAL, M_INVAL}: ERROR
+        o FILL_S -> SS: RSP_LOAD/1 forwarded to L2.
+        o FILL_E -> SM: RSP_LOAD/1 with exclusive forwarded to L2.
+
+
+Directory:
+
+State:
+  * Bit vector, one per L2.  On when data present in L2.
+  * Active req flag
+
+    * New FORCE_INVAL from LLC
+      * All bits clear:  Send response to LLC
+      * Not all clear: Set active req, Send FORCE_INVAL/1 to each L2
+    * WB_INVAL: Update bit vector
+      * Active req: If all clear send response to LLC

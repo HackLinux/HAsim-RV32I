@@ -1,0 +1,10 @@
+%name Matrix matrix multiply memory unit
+%desc memory unit
+
+%provides mmm_memory_unit
+
+%public  PLBMasterMagic.bsv
+
+
+%param --dynamic OPS_INFLIGHT 64 "Which soft connection should get extra latency?"
+

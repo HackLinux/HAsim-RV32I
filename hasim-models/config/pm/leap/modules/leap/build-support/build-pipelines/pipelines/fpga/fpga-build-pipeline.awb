@@ -1,0 +1,25 @@
+#/********************************************************************
+#* Generic FPGA build pipeline
+#********************************************************************/
+
+%name FPGA Build Pipeline
+%desc FPGA Build Pipeline
+%attributes tool
+
+%provides build_pipeline
+%requires bsv_tool
+%requires iface_tool
+%requires software_tool
+%requires synthesis_tool
+%requires post_synthesis_tool
+%requires mcd_tool
+%requires fpga_program_tool
+%requires wrapper_gen_tool
+%requires li_module
+%requires parameter_substitution
+
+%notes README
+
+%scons %library FPGAPipeline.py
+
+%param BUILD_PIPELINE_DEBUG 0 "Enable build pipeline debug"

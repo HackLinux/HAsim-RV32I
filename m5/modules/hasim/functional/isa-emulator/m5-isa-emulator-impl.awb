@@ -1,0 +1,10 @@
+%name m5 ISA Emulator Implementation
+%desc m5 ISA Emulator Implementation
+%provides isa_emulator_impl
+
+%attributes hasim
+
+%sources -v PUBLIC  m5-isa-emulator-impl.h
+%sources -v PRIVATE m5-isa-emulator-impl.cpp
+
+%param --dynamic SKEW_CONTEXTS  8  "Skew start times of each context to avoid running identical instructions on all contexts.  Max. skew is 127."

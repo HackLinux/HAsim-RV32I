@@ -1,0 +1,15 @@
+%name Heat Transfer Test Connected Application
+%desc Heat Transfer Test Connected Application
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%requires heat_transfer_system
+
+%sources -t BSV -v PUBLIC  connected-application-test.bsv
+%sources -t H   -v PUBLIC  connected-application-test.h  
+%sources -t CPP -v PRIVATE connected-application-test.cpp
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

@@ -1,0 +1,24 @@
+%name Common Services
+%desc Wrap Base Devices in Soft Connections
+
+%provides common_services
+
+%requires assertions_service
+%requires debug_scan_service
+%requires dynamic_parameters_service 
+%requires stats_service
+%requires stdio_service
+%requires starter_service
+
+%attributes hybrid connected
+
+%notes README
+
+%public  common-services-standard.bsh
+%public  common-services-standard.bsv
+%public  common-services-standard.h
+%private common-services-standard.cpp
+
+%param --global  BUILD_COMMON_SERVICES 1 "Actually instantiate common services""
+
+%param SYNTH_BOUNDARY mkCommonServices "Name of synthesis boundary"

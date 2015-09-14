@@ -1,0 +1,18 @@
+Debug Scan Service
+
+This service wraps the Debug Scan Virtual Device in Soft Connections.
+
+Connection Chains are used so that there can be many different modules
+connected to the device efficiently.
+
+Sets of values to scan are collected in DEBUG_SCAN_FIELD_LISTs by
+adding them with module addDebugScanField.  For example:
+
+    DEBUG_SCAN_FIELD_LIST dbg_list = List::nil;
+    dbg_list <- addDebugScanField(dbg_list, "Read state", readState);
+    dbg_list <- addDebugScanMaybeField(dbg_list, "Token", tok);
+    ...
+
+The list of fields must then be attached to a scan node:
+
+    let dbgNode <- mkDebugScanNode("My module's state", dbg_list);

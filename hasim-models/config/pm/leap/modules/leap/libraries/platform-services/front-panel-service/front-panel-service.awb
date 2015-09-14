@@ -1,0 +1,12 @@
+%name Front Panel Device
+%desc Wrap the Front Panel Driver in Soft Connections
+
+%provides front_panel_device
+%requires front_panel
+
+%attributes hybrid connected
+
+%notes README
+
+%public front-panel-service.bsh
+%public front-panel-service.bsv

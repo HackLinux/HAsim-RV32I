@@ -1,0 +1,8 @@
+%name Matrix matrix multiply common files
+%desc memory unit
+
+%provides mmm_common
+
+%public  Common.bsv Complex16.bsv DebugFlags.bsv Interfaces.bsv MultPrim.bsv Parameters.bsv Types.bsv Utils.bsv 
+
+

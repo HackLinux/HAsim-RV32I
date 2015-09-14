@@ -1,0 +1,19 @@
+%name PCIe Board with DDR
+%desc PCIe Board with DDR
+
+%provides physical_platform
+
+%requires physical_platform_config
+%requires clocks_device
+%requires pcie_device
+%requires ddr_sdram_device
+%requires aurora_device
+%requires physical_platform_utils
+
+%sources -t BSV -v PUBLIC  pcie-generic-platform.bsv
+%sources -t BSH -v PUBLIC  pcie-generic-platform.bsh
+%sources -t CPP -v PRIVATE pcie-generic-platform.cpp
+%sources -t H   -v PUBLIC  pcie-generic-platform.h
+
+%param DRAM_CLOCK_MECHANISM  "InternalBuffered"  "DDR Clock Source:  Buffered - use whatever the clock device uses; Differential - use an incoming differential clock"
+

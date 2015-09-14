@@ -1,0 +1,9 @@
+
+[Global]
+Buildorder=1000
+Version=1
+Lock=asim-m5
+Description=Description of m5
+Name=m5
+Tag=HEAD
+CSN=CSN-m5-78

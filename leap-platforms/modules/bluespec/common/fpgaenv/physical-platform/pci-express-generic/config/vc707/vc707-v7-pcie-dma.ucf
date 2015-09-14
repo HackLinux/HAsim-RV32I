@@ -1,0 +1,31 @@
+## Project    : Series-7 Integrated Block for PCI Express
+## File       : xilinx_pcie_2_1_ep_7x_08_lane_gen1_xc7vx485t-ffg1761-2_VC707.ucf
+## Version    : 1.7
+
+###############################################################################
+# Define Device, Package And Speed Grade
+###############################################################################
+
+CONFIG PART = xc7vx485t-ffg1761-2;
+
+
+######################################################################################################
+# PIN ASSIGNMENTS
+######################################################################################################
+
+NET  "clocksWires_rst_put"                          LOC = AV40 | IOSTANDARD = LVCMOS18 | NODELAY | PULLUP | TIG;
+
+NET  "clocksWires_clk_p_put"                        TNM_NET = TNM_clk_in;    # 200 MHz
+NET  "clocksWires_clk_p_put"                        LOC = E19 | IOSTANDARD = DIFF_SSTL15;
+NET  "clocksWires_clk_n_put"                        LOC = E18 | IOSTANDARD = DIFF_SSTL15;
+
+
+######################################################################################################
+# Timing
+######################################################################################################
+
+TIMESPEC TS_clk_in = PERIOD TNM_clk_in 200 MHz HIGH 50 % ;
+
+
+disable = reg_sr_o;
+disable = reg_sr_r;

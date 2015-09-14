@@ -1,0 +1,9 @@
+%name L1 MESI DCache
+%desc L1 MESI DCache
+
+%provides hasim_l1_dcache
+%requires hasim_l1_dcache_alg
+
+%attributes hasim model caches
+
+%public l1-dcache-controller-MESI.bsv 

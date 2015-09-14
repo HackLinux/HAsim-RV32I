@@ -1,0 +1,13 @@
+service ASSERTIONS
+{
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method AssertStr(in UINT64[64] fpgaCC,
+                         in UINT32[32] strUID,
+                         in UINT8[8] severity);
+
+        method AssertDict(in UINT64[64] fpgaCC,
+                          in UINT32[32] assertBase,
+                          in UINT32[32] assertions);
+    };
+};

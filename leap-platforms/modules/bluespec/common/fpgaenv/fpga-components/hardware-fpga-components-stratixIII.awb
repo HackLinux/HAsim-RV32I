@@ -1,0 +1,40 @@
+%name Hardware FPGA Components for StratixIII
+%desc Hardware FPGA Components for StratixIII
+
+%provides fpga_components
+
+%attributes hasim
+
+%public bram.bsv bram-multi-read.bsv
+%public lutram.bsv
+%public alu-support.bsv
+%public user-clock.bsv
+%public user-clock-altera.bsv
+%public shiftreg.bsv
+
+%sources -t BSV -v PUBLIC  crossing-reg.bsv
+%sources -t VERILOG -v PRIVATE leap_crossing_reg.v
+
+%generated -t VERILOG mkUserClock_DivideByThree.v
+%generated -t VERILOG mkUserClock_DivideByTwo.v
+%generated -t VERILOG mkUserClock_DivideByFour.v
+
+%generated -t VERILOG mkAsyncResetStage.v
+
+%sources -t BSV -v PUBLIC  io-components-altera.bsv
+
+%sources -t BSV -v PUBLIC  clock-import.bsv
+%sources -t VERILOG -v PRIVATE clock_import.v
+
+%private Bram.v
+%private lutram.v
+%private shiftreg.v
+%private user-clock-altera-stratixIII.v
+
+%sources -t BSV -v PUBLIC  differential-clock-import.bsv
+
+%sources -t BSV -v PUBLIC  reset.bsv
+%sources -t VERILOG -v PRIVATE reset_import.v
+
+%param SYNTH 1            "Synthesize it to FPGAs"
+%param BROKEN_REGFILE 1   "0 if RegFile synthesizes correctly.  Nonzero for Xilinx Xst < version 11."

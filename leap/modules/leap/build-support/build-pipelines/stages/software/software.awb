@@ -1,0 +1,18 @@
+#/********************************************************************
+#* Python libraries for XST synthesis tool
+#********************************************************************/
+
+%name Software build tool
+%desc Build for software side of hybrid system
+
+%attributes tool
+
+%provides software_tool
+
+%notes README
+
+%scons %library software.py
+
+%param --global DUMP_LIM_GRAPH 0 "Should we dump a LIM graph."
+%param --global BUILD_FIRST_PASS_SOFTWARE 0 "Should we build software during first pass build? (For legacy compilation only)."
+

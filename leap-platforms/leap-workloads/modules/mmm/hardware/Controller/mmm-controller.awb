@@ -1,0 +1,11 @@
+%name Matrix matrix controller
+%desc Matrix matrix multiplication
+
+%attributes slave connected hybrid
+
+%provides mmm_controller
+
+%public  StoredController.bsv
+%public  StoredController.rrr
+
+

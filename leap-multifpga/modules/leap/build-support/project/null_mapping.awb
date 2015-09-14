@@ -1,0 +1,13 @@
+%name Null FPGA Mapping
+%desc NULL mapping may be used for all single-FPGA designs.
+
+%attributes tool
+
+%provides fpga_mapping
+
+%sources -t FPGAENV_MAPPING -v PUBLIC null-mapping.map
+
+
+
+
+

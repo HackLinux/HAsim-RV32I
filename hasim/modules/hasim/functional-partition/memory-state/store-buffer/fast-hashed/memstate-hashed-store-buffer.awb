@@ -1,0 +1,11 @@
+%name Hashed Store Buffer
+%desc Hashed Store Buffer
+
+%provides funcp_memstate_storebuffer
+
+%attributes hasim funcp memstate
+
+%public memstate-hashed-store-buffer.bsv
+%public memstate-hashed-store-buffer.dic
+
+%param --global MEMSTATE_SBUFFER_OOO_MEM 0 "0=Return youngest match, 1=Search history for best match"

@@ -1,0 +1,10 @@
+
+[Global]
+CSN=CSN-mmm-20
+Version=1
+Buildorder=1000
+Lock=asim-leap-workloads
+Prerelease=1
+Name=leap-workloads
+Description=Description of leap-workloads
+Tag=HEAD

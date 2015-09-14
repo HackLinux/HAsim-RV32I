@@ -1,0 +1,11 @@
+%name Matrix Matrix Multiplication Remote Module 2
+%desc Matrix Matrix Multiplication Remote Module 2
+
+%attributes matrix_multiply test
+
+%provides matrix_multiply_remote2
+
+%public matrix-multiply-remote2.bsv
+    
+%param SYNTH_BOUNDARY mkMatrixMultiplyRemote2 "name of synthesis boundary"
+

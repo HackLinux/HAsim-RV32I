@@ -1,0 +1,28 @@
+Source: leap-multifpga
+Section: devel
+Priority: optional
+Maintainer: Kermin Fleming <kermin.fleming@gmail.com>
+Build-Depends: debhelper (>= 7), dkms, autotools-dev
+Standards-Version: 3.7.2
+
+Package: leap-multifpga
+Architecture: all
+Depends: leap-multifpga-15.02
+Recommends:
+Description: Dependency package for Leap multifpga environment
+ Dependency package for the Leap multifpga environment
+Section: devel
+
+Package: leap-multifpga-15.02
+Architecture: any
+Depends: leap-multifpga-bin, ${misc:Depends}
+Description: Sharable package for the Leap multifpga
+  AWB modules for the leap multifpga
+Section: devel
+
+Package: leap-multifpga-bin
+Architecture: any
+Depends: awb, python-ply, python-pygraph, python-glpk, libboost-system-dev, libboost-thread-dev, ${misc:Depends}
+Description: Executables for the Leap multifpga environement
+ Core executables and drivers for Leap multifpga
+Section: devel

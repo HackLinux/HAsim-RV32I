@@ -1,0 +1,18 @@
+#/********************************************************************
+#* Python libraries for Synplify synthesis tool
+#********************************************************************/
+
+%name Synplify Synthesis Tool
+%desc Synplify Synthesis Tool
+%attributes tool
+
+%provides synthesis_tool
+%requires synthesis_library
+
+%notes README
+
+%scons %library Synplify.py
+%scons %library SynplifyCommon.py
+%sources -t SDC -v PRIVATE synplify.sdc
+%sources -t SDC -v PRIVATE bluespec.sdc
+

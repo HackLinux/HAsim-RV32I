@@ -1,0 +1,10 @@
+%name Chip Base Types
+%desc Chip Base Types
+%provides chip_base_types
+
+%attributes hasim model chip 
+
+%public chip-base-types.bsv
+
+%param --global MAX_NUM_CPUS           2   "Maximum number of CPUs on the chip."
+%param --global MAX_NUM_MEM_CTRLS      1   "Maximum number of on-chip memory controllers."

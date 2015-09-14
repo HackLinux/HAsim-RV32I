@@ -1,0 +1,10 @@
+%name CartPol Cache with Dual Scratchpads
+%desc memory unit
+
+%provides cartpol_cache
+
+%public CacheWrapper.bsv  GetPutExt.bsv  mkDataCacheBlockingBramDoublePumpOverlappedSkinny.bsv CacheWrapperSplit.bsv ICache.bsv IMemArb.bsv  PLBShimNull.bsv  mkMemArb.bsv CacheWrapperSplitDoublePumpScratchpad.bsv
+%public memory.dic 
+
+
+

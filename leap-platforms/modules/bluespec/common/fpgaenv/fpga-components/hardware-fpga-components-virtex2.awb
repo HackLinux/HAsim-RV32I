@@ -1,0 +1,36 @@
+%name Hardware FPGA Components for Virtex 2
+%desc Hardware FPGA Components for Virtex 2
+
+%provides fpga_components
+
+%attributes hasim
+
+%public bram.bsv bram-multi-read.bsv
+%public lutram.bsv
+%public alu-support.bsv
+%public user-clock.bsv
+%public user-clock-xilinx.bsv
+%public shiftreg.bsv
+
+%sources -t BSV -v PUBLIC  crossing-reg.bsv
+%sources -t VERILOG -v PRIVATE leap_crossing_reg.v
+
+%sources -t BSV -v PUBLIC  io-components-xilinx.bsv
+
+%sources -t BSV -v PUBLIC  clock-import.bsv
+%sources -t VERILOG -v PRIVATE clock_import.v
+
+%private Bram.v
+%private shiftreg.v
+%private lutram.v
+%private user-clock-xilinx-virtex2.v
+
+%sources -t SDC -v PRIVATE xilinx-components.sdc
+%sources -t XCF -v PRIVATE xilinx-components.xcf
+
+%param SYNTH 1            "Synthesize it to FPGAs"
+%param BROKEN_REGFILE 1   "0 if RegFile synthesizes correctly.  Nonzero for Xilinx Xst < version 11."
+%param XILINX_FAMILY "virtex5"  "Xilinx parameter describing the fpga architecture"
+
+
+

@@ -1,0 +1,19 @@
+#/********************************************************************
+#* Python libraries for Bluespec MultiFPGA build
+#********************************************************************/
+
+%name FPGAMap
+%desc A data type for describing FPGA environments
+
+%attributes tool
+
+%provides fpgamap_parser
+
+%scons %library fpgamap.py
+%scons %library fpgamap_parser.py
+%scons %private fpgamaplex.py
+%scons %private fpgamapparse.py
+
+
+
+

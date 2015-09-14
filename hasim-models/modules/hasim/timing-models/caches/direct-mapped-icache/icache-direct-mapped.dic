@@ -1,0 +1,1 @@
+def VDEV.SCRATCH.DIRECT_MAPPED_ICACHE_TAGS "scratch_icache_tags";

@@ -1,0 +1,8 @@
+%name Cryptosorter common files
+%desc memory unit
+
+%provides cryptosorter_common
+
+%public DebugFlags.bsv Parameters.bsv  
+
+

@@ -1,0 +1,20 @@
+Scratchpad Memory Service
+
+This module wraps the LEAP Scratchpad Virtual Device in Soft Connections. 
+Connection Chains are used so that many distributed modules can efficiently
+connect to the device.
+
+First, an entry for the Scratchpad is defined using LEAP Dictionaries:
+
+def VDEV.SCRATCH.ICACHE_DATA "Scratchpad for storing ICache data.";
+
+Then the Scratchpad is constructed, typcically with mkScratchpad() or 
+mkScratchpadMultiRead()
+
+let cacheData <- mkScratchpad(`VDEV_SCRATCH_ICACHE_DATA, SCRATCHPAD_CACHED);
+
+
+Subdirectories contain varying implementations of scratchpad memory:
+  common/     Base typedefs and common definitions.
+  hybrid/     HW/SW scratchpad that uses HW local memory backed by SW memory.
+  local/      HW scratchpad using local memory only.

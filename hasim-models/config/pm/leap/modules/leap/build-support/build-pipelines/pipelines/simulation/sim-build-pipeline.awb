@@ -1,0 +1,22 @@
+#/********************************************************************
+#* Generic FPGA build pipeline
+#********************************************************************/
+
+%name BlueSim Build Pipeline
+%desc BlueSim Build Pipeline
+%attributes tool
+
+%provides build_pipeline
+%requires bsv_tool
+%requires iface_tool
+%requires software_tool
+%requires bluesim_tool
+%requires verilog_tool
+%requires wrapper_gen_tool
+%requires li_module
+
+%notes README
+
+%scons %library SimulationPipeline.py
+
+%param BUILD_PIPELINE_DEBUG 0 "Enable build pipeline debug"

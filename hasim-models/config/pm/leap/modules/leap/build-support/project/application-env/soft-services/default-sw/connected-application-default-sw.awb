@@ -1,0 +1,16 @@
+%name Default Software Connected Application
+%desc Default Software Connected Application
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%requires hardware_system
+
+%notes README
+
+%public  connected-application-default-sw.bsv
+%public  connected-application-default-sw.h
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

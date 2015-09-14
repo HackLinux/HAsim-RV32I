@@ -1,0 +1,16 @@
+#/********************************************************************
+#* Python libraries for XST synthesis tool
+#********************************************************************/
+
+%name Xilinx MAP
+%desc Xilinx MAP
+%attributes tool
+
+%provides xilinx_map
+
+%notes README
+
+%scons %library XILINX_MAP.py
+
+%param --global MAPPER_OPTIONS  "-global_opt on"  "Xilinx mapper options"
+%param COST_TABLE   1   "Placement and routing cost table"

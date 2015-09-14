@@ -1,0 +1,12 @@
+%name RV32I ISA Datapath V3
+%desc RV32I ISA Datapath V3
+%provides hasim_isa_datapath
+
+%attributes isa template
+
+%public isa_datapath_rv32i.bsv
+
+%param SYNTH_BOUNDARY mkISA_Datapath "Name of synthesis boundary"
+%param HASIM_ISA_DP_LOGFILE "hasim_isa_dp.out" "Name of ISA Datapath logfile"
+
+%param --dynamic DEBUG_ISA_DP    0 "Emit ISA datapath debug log? (Bool)"

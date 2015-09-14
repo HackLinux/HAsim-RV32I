@@ -1,0 +1,22 @@
+********************************************************************
+* Awb module specification
+********************************************************************
+
+%AWB_START
+
+%name Hello World
+%desc Hello World
+
+%attributes hello hybrid
+
+%provides connected_application
+
+%notes README 
+
+%sources -t BSV  -v PUBLIC  hello-world.bsv
+%sources -t H    -v PUBLIC  hello-world.h
+%sources -t CPP  -v PRIVATE hello-world.cpp
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+
+%AWB_END

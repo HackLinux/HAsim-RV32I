@@ -1,0 +1,31 @@
+#/********************************************************************
+#* Python libraries for XST synthesis tool
+#********************************************************************/
+
+%name BSV Build Tool (First Phase)
+%desc This tool builds Bluespec modules in sub directories
+
+%attributes tool
+
+%provides bsv_tool
+
+%notes README
+
+%scons %library BSV.py
+%scons %library BSVSynthTreeBuilder.py
+%scons %library treeModule.py
+%scons %library BSVUtils.py
+
+
+%sources -t XCF -v PRIVATE bluespec.xcf
+%sources -t TCL -v PRIVATE path.tcl
+%sources -t TCL -v PRIVATE sched.tcl
+%sources -t TCL -v PRIVATE interfaceType.tcl
+
+
+%param BSC_FLAGS  "-steps 10000000 +RTS -K1000M -RTS -suppress-warnings G0043 -keep-fires -aggressive-conditions -wait-for-license -no-show-method-conf -licenseWarning 7 -elab -show-schedule -show-range-conflict -verilog -remove-dollar -show-method-bvi"  "Bluespec compiler options"
+%param --global USE_BVI  0                   "Direct tool to use BVI indirection (enables object code caching between LIM phases)"
+%param BUILD_VERILOG  1             "Direct BSC to build verilog"
+%param --global BUILD_LOGS_ONLY 0   "True if we should build only logfiles"
+
+

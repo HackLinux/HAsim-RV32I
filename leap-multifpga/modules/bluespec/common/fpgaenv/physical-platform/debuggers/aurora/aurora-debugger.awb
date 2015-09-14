@@ -1,0 +1,15 @@
+%name Aurora Debugger
+%desc Aurora Debugger
+
+%provides physical_platform_debugger
+
+%attributes hybrid connected
+
+%public aurora-debugger.bsv
+%public aurora-debugger.cpp
+%public aurora-debugger.h
+
+
+%param --global DEBUG_DRIVER_MODE 0 "Exposes a direct driver interface to user program"
+%param --global MONITOR_DRIVER_MODE 1 "Instantiates a runtime monitor for the aurora driver"
+%param --dynamic TARGET_AURORA 0  "Time between attempts to transmit"

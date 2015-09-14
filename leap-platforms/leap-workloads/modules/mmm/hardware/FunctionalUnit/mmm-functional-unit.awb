@@ -1,0 +1,12 @@
+%name Matrix matrix functional unit
+%desc Matrix matrix multiplication
+
+%attributes slave connected hybrid
+
+%provides mmm_functional_unit
+
+%public  FunctionalUnit.bsv
+
+
+
+

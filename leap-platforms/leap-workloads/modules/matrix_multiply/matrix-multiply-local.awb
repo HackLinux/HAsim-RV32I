@@ -1,0 +1,11 @@
+%name Matrix Matrix Multiplication Local Module
+%desc Matrix Matrix Multiplication Local Module
+
+%attributes matrix_multiply test
+
+%provides matrix_multiply_local
+
+%public matrix-multiply-local.bsv
+    
+%param SYNTH_BOUNDARY mkMatrixMultiplyLocal "name of synthesis boundary"
+

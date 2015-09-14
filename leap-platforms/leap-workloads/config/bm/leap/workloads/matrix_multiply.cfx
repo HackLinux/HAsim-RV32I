@@ -1,0 +1,31 @@
+: # -*-Perl-*-
+eval 'exec perl -w "$0" ${1+"$@"}'
+   if 0;
+
+##
+## Directory of hasim benchmarks
+##     Remember to set this file as executable
+
+use Asim;
+use strict;
+
+my $gcfg = Asim::GenCFG->new();
+
+
+my @bmark_tests = ("matrix_multiply_64x64_64x64",
+                   "matrix_multiply_128x128_128x128",
+                   "matrix_multiply_256x256_256x256",
+                   "matrix_multiply_512x512_512x512",
+                   "matrix_multiply_1024x1024_1024x1024",
+                  );                   
+
+foreach my $bmark (@bmark_tests) {
+    $gcfg->add(name => $bmark,
+               tree => [ "benchmarks" ],
+               setup => "scripts/setup-matrix-multiply-bmark --data=../modules/matrix_multiply/benchmark/$bmark $bmark",
+               feeder => "none",
+               ccount => 800000,
+              );
+}
+
+$gcfg->action(@ARGV);

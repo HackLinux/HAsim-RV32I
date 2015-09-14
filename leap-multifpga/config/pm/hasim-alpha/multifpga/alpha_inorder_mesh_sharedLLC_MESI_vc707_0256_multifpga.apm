@@ -1,0 +1,68 @@
+
+[Global]
+SaveParameters=0
+Description=Inorder Alpha Mesh with shared LLC and MESI Coherence (0256 cores) MultiFPGA VC707
+File=alpha_inorder_mesh_sharedLLC_MESI_vc707_0256_multifpga
+Version=2.2
+Name=Inorder Alpha Mesh with shared LLC and MESI Coherence (0256 cores) MultiFPGA VC707
+Type=HAsim
+Class=Asim::Model
+DefaultBenchmark=
+DefaultRunOpts=
+RootName=HW/SW Hybrid Multifpga Project Foundation
+RootProvides=model
+
+[Model]
+DefaultAttributes=hasim inorder alpha acp
+model=HW/SW Hybrid Multifpga Project Foundation
+
+[HW/SW Hybrid Multifpga Project Foundation]
+File=modules/leap/build-support/project/project-multifpga.awb
+Packagehint=multifpga
+
+
+
+
+
+
+[HW/SW Hybrid Multifpga Project Foundation/Requires]
+build_pipeline=LIM Compiler Pipeline
+connected_application=Inorder Alpha Mesh with shared LLC and MESI Coherence (0256 cores)
+environment_description=VC707 Dual FPGA Environment (SMA)
+fpga_mapping=Alpha Inorder Mapping Timing/Functional partition with Cache
+
+[HW/SW Hybrid Multifpga Project Foundation/Params]
+SYNTH_BOUNDARY=mkModel
+
+
+
+
+[VC707 Dual FPGA Environment (SMA)]
+File=modules/leap-platforms/fpga-environments/vc707/vc707_dual_env.awb
+Packagehint=multifpga
+
+
+
+[Alpha Inorder Mapping Timing/Functional partition with Cache]
+File=modules/multifpga/alpha_inorder/inorder_mapping_time_func_cache.awb
+Packagehint=multifpga
+
+[Inorder Alpha Mesh with shared LLC and MESI Coherence (0256 cores)/Params]
+STAGE_CONTROLLER_BUF_MAX=128
+
+[Inorder Alpha Mesh with shared LLC and MESI Coherence (0256 cores)]
+File=config/pm/hasim-alpha/alpha-inorder/cache-models/submodels/app_alpha_inorder_mesh_sharedLLC_MESI_0256.apm
+Packagehint=hasim-alpha
+
+
+
+
+
+
+
+
+
+
+[LIM Compiler Pipeline]
+File=config/pm/leap/submodels/pipelines/build-pipeline-lim.apm
+Packagehint=multifpga

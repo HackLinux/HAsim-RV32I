@@ -1,0 +1,8 @@
+%name CartPol Cordic Library
+%desc memory unit
+
+%provides cartpol_cordic
+
+%public CORDIC.bsv  CORDICTrigonometry.bsv  FPComplex.bsv  FixedPointNew.bsv  FloatToFixedPoint.bsv  CORDICDivision.bsv  ComplexLibrary.bsv   FixedPointLibrary.bsv  Float.bsv   Pipeline.bsv 
+
+

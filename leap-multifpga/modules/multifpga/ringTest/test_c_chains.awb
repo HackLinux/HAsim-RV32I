@@ -1,0 +1,12 @@
+%AWB_START
+
+%name MultiFPGA Rings Test 
+%desc MultiFPGA	Rings Test 
+
+%provides test_c
+
+%public test-c-chains.bsv
+
+%param SYNTH_BOUNDARY mkC "name of synthesis boundary"
+
+%AWB_END

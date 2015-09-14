@@ -1,0 +1,17 @@
+%name Split (Instruction and Data) No TLBs
+%desc Split L1 caches (Instruction and Data) No TLBs
+
+%provides hasim_private_caches
+%requires hasim_l1_icache
+%requires hasim_l1_dcache
+%requires hasim_miss_tracker
+%requires hasim_l1_arbiter
+%requires l1_cache_base_types
+%requires hasim_l2_cache
+
+%attributes hasim model caches
+
+%public private-caches-no-tlbs.bsv
+%public private-caches-no-tlbs.h
+
+%param SYNTH_BOUNDARY mkPrivateCaches "Name of synthesis boundary"

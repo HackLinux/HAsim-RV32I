@@ -1,0 +1,15 @@
+%AWB_START
+
+%name Inorder Decode/Issue Stage
+%desc Inorder Decode/Issue Stage
+%provides decode_stage
+
+%attributes hasim model pipeline inorder
+
+%public  inorder-decode-stage.bsv
+%public  inorder-decode-prf-scoreboard.bsv
+%private decode.dic
+
+%param SYNTH_BOUNDARY mkDecode "Name of synthesis boundary."
+
+%AWB_END

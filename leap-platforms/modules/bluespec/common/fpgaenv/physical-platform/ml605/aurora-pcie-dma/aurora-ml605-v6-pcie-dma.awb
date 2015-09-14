@@ -1,0 +1,23 @@
+%name ML605 Virtex-6 Platform with PCIe and Aurora
+%desc ML605 Virtex-6 Platform with PCIe and Aurora
+
+%provides physical_platform
+
+%requires clocks_device
+%requires pcie_device
+%requires ddr_sdram_device
+%requires physical_platform_utils
+%requires aurora_device
+%requires physical_platform_config
+
+%sources -t BSV -v PUBLIC  ml605-v6-pcie-dma.bsv
+%sources -t BSH -v PUBLIC  ml605-v6-pcie-dma.bsh
+%sources -t CPP -v PRIVATE ml605-v6-pcie-dma.cpp
+%sources -t H   -v PUBLIC  ml605-v6-pcie-dma.h
+
+##
+## N_TOP_LEVEL_CLOCKS may not be 0 because the Bluespec preprocessor can test
+## only whether the parameter exists.  To export no clock and reset from
+## the top level remove the parameter from the platform configuration.
+##
+%param N_TOP_LEVEL_CLOCKS   2   "Number of clocks exposed in the top level interface"

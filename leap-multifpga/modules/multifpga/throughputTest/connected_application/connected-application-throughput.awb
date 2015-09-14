@@ -1,0 +1,17 @@
+%name MultiFPGA Throughput Test Connected Application
+%desc MultiFPGA Throughput Test Connected Application
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%requires hardware_system
+
+%public  connected-application-throughput.bsv
+%public  connected-application-throughput.h
+%public  connected-application-throughput.cpp
+
+%param --dynamic MAXIMUM_TEST_ITERATIONS 10000  "Maximum number of tokens in throughput test"
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

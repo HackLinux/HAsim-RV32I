@@ -1,0 +1,10 @@
+%name Functional Partition Interface
+%desc Functional Partition Interface
+
+%provides funcp_interface
+%attributes hasim funcp
+
+%public funcp-isa-datapath-types.bsv
+%public funcp-timing-interface.bsv
+%public funcp-req-constructors.bsv
+%public funcp-rsp-constructors.bsv

@@ -1,0 +1,17 @@
+%name Aurora Device Wrapper (Quad) VC707
+%desc Taps out the various Aurora channels on the VC707.
+
+%provides aurora_device
+%requires aurora_common
+%requires aurora_driver
+%requires aurora_flowcontrol
+
+%sources -t BSV -v PUBLIC aurora-device-vc707-quad.bsv
+%sources -t BSH -v PUBLIC aurora-device-vc707.bsh
+%sources -t UCF -v PUBLIC vc707-aurora-sma-quad.ucf
+
+%generated -t VERILOG mkAuroraDevice.v
+%generated -t BA  mkAuroraDevice.ba
+
+%param NUM_AURORA_IFCS   3   "Number of Aurora Interfaces"
+%param AURORA_IFC_WORDS  3   "Width of the model-side Aurora interface (0 for automatic based on relative frequencies.)"

@@ -1,0 +1,11 @@
+service CRYPTOSORTERCONTROLRRR
+{
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+       method PutInstruction(in UINT32[32] size, in UINT32[32] style, in UINT32[32] seed, out UINT64[64] dummy);
+       method ReadCycleCount(in UINT64[64] instruction, out UINT64[64] done, out UINT64[64] cycleCount);
+    };
+}
+
+
+

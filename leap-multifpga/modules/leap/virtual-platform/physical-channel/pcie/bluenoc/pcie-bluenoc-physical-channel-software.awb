@@ -1,0 +1,18 @@
+%name BlueNoC PCIe Tunnel
+%desc BlueNoC PCIe Tunnel
+
+%provides pcie_physical_channel
+
+%notes README
+
+%public pcie-bluenoc-physical-channel.bsv
+
+%public pcie-bluenoc-physical-channel.cpp
+%public pcie-bluenoc-physical-channel.h
+
+%sources -t LOG     -v PUBLIC   pcie-bluenoc-physical-channel.log
+
+%syslibrary tbb
+
+%param SOFT_RESET 1 "Does this channel support soft reset?"
+

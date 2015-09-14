@@ -1,0 +1,2 @@
+def VDEV.SCRATCH.BANK_A     "memory bank A";
+def VDEV.SCRATCH.BANK_B     "matrix bank B";

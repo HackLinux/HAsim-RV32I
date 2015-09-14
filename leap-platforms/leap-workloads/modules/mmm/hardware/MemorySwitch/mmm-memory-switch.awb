@@ -1,0 +1,9 @@
+%name Matrix matrix memory switch
+%desc Matrix matrix multiplication
+
+%attributes slave connected hybrid
+
+%provides mmm_memory_switch
+
+%public  SimpleMemorySwitch.bsv
+

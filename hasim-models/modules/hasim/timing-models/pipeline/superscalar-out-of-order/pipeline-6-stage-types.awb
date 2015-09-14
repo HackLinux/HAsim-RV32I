@@ -1,0 +1,21 @@
+%AWB_START
+
+%name OOO pipeline types
+%desc OOO pipeline types
+%provides pipeline_base_types
+
+%attributes hasim
+
+%public pipeline-6-stage-types.bsv
+
+%param FETCH_CREDITS 32 "Fetch Buffer Credits"
+%param FETCH_NUM 4 "Fetch Bandwidth"
+%param ROB_INDEX_SIZE 5 "ROB index size"
+%param DECODE_NUM 4 "Decode Bandwidth"
+%param COMMIT_NUM 4 "Commit Bandwidth"
+%param MEM_NUM 1 "Mem unit issue bandwidth"
+%param MEM_CREDITS 2 "Mem unit credits"
+%param ALU_NUM 4 "ALU unit issue bandwidth"
+%param ALU_CREDITS 8 "ALU unit credits"
+
+%AWB_END

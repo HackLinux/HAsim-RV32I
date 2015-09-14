@@ -1,0 +1,86 @@
+
+[Global]
+SaveParameters=0
+Description=has strange module alingments
+File=test_multifpga_compress
+Version=2.2
+Name=Multifpga synthesis test 
+DefaultBenchmark=
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Multifpga Project Foundation
+RootProvides=model
+
+[Model]
+DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project exe
+model=HW/SW Hybrid Multifpga Project Foundation
+
+[HW/SW Hybrid Multifpga Project Foundation/Requires]
+connected_application=MultiFPGA Loop Test Connected Application
+environment_description=Simulation Dual FPGA Environment
+build_pipeline=LIM Compiler Pipeline
+fpga_mapping=Test Sim Mapping
+
+[HW/SW Hybrid Multifpga Project Foundation]
+File=modules/leap/build-support/project/project-multifpga.awb
+Packagehint=multifpga
+
+
+
+
+
+[Simulation Dual FPGA Environment]
+File=modules/leap-platforms/fpga-environments/sim/sim_fpga_env.awb
+Packagehint=multifpga
+
+[Test Sim Mapping]
+File=modules/multifpga/synthTest/sim_mapping.awb
+Packagehint=multifpga
+
+
+
+
+
+[MultiFPGA Loop Test Connected Application/Requires]
+hardware_system=MultiFPGA compress test module top
+
+[MultiFPGA Loop Test Connected Application]
+File=modules/multifpga/longChain/connected_application/connected-application-throughput.awb
+Packagehint=multifpga
+
+
+[Compression test module d]
+File=modules/multifpga/compressionTest/test_d.awb
+Packagehint=multifpga
+
+[Compression test module c]
+File=modules/multifpga/compressionTest/test_c.awb
+Packagehint=multifpga
+
+[MultiFPGA compress test module top]
+File=modules/multifpga/compressionTest/top.awb
+Packagehint=multifpga
+
+[MultiFPGA compress test module top/Requires]
+compress_common=MultiFPGA compress test common
+test_c=Compression test module c
+test_d=Compression test module d
+
+[MultiFPGA compress test common]
+File=modules/multifpga/compressionTest/common.awb
+Packagehint=multifpga
+
+
+
+
+
+
+
+
+
+
+
+[LIM Compiler Pipeline]
+File=config/pm/leap/submodels/pipelines/build-pipeline-lim.apm
+Packagehint=multifpga

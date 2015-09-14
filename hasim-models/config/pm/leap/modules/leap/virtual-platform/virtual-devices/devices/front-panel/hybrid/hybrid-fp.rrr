@@ -1,0 +1,12 @@
+service FRONT_PANEL
+{
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+        method UpdateSwitchesButtons(in UINT32[32] state);
+    };
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method UpdateLEDs(in UINT8[8] state);
+    };
+};

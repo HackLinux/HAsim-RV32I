@@ -1,0 +1,10 @@
+%name m5 HAsim Base Class
+%desc m5 HAsim Base Class
+
+%provides m5_hasim_base
+%requires m5_simulator
+
+%sources -v PUBLIC  m5-hasim-base.h
+%sources -v PRIVATE m5-hasim-base.cpp
+
+%param --global MAX_NUM_CONTEXTS 8 "Maximum number of hardware threads simulated."

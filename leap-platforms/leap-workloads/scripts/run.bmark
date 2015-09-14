@@ -1,0 +1,690 @@
+#!/usr/bin/env perl
+# -*- perl -*-
+
+use strict;
+use warnings;
+use Getopt::Long qw(:config no_auto_abbrev no_ignore_case pass_through);
+use IO::Pty;
+
+#
+# Turn on warnings
+#
+$^W = 1;
+
+##
+## Benchmark run script
+##
+
+sub ExecModel($);
+sub Exec($$);
+sub ExecRead($$);
+sub CompareOutput();
+sub ReadConfig($$);
+sub ReserveFPGA($);
+sub ProgramFPGA($$$);
+sub ActivateFPGA($);
+sub DeactivateFPGA($);
+
+#############################################################################
+#############################################################################
+##
+## Start by figuring out the model location and type.
+##
+#############################################################################
+#############################################################################
+
+my %config;
+
+#set config{master} to silence warnings.
+$config{master} = "";
+
+ReadConfig("config/env.sh", 1);
+ReadConfig("$config{modelDir}/config/env.sh", 1);
+ReadConfig("$config{modelDir}/config/platform_env.sh", 0);
+
+# we should now have visibility into the types of platforms that we
+# are dealing with. Let's set up some data structures.
+my $platforms_ref = $config{"platforms"};
+
+#############################################################################
+#############################################################################
+##
+## Setup environment variables that can be used by subordinate targets
+##
+#############################################################################
+#############################################################################
+
+my $executionDirectory = `pwd`;
+chomp($executionDirectory);
+$ENV{LEAP_EXECUTION_DIRECTORY} = $executionDirectory;
+
+#############################################################################
+#############################################################################
+##
+## Process command line arguments
+##
+#############################################################################
+#############################################################################
+
+my $help = 0;
+my $onlyCompare = 0;
+my $noCompare = 0;
+my $forceLoad = 0;
+my $gdb = 0;
+my $noProgram = 0;
+my $noReserve = 0;
+my $fakeStats = 0;
+my $timeout = undef;
+my $printCycle = undef;
+my $bluesimCmd = undef;
+my $vcdStart = undef;
+my $vcdCycles = 20000;
+
+my $status = GetOptions("help!" => \$help,
+                        "gdb!" => \$gdb,
+                        "noprogram!" => \$noProgram,
+                        "noreserve!" => \$noReserve,
+                        "timeout=i" => \$timeout,
+                        "fakestats!" => \$fakeStats,
+                        "force-load!" => \$forceLoad,
+                        "onlycompare!" => \$onlyCompare,
+                        "nocompare!" => \$noCompare,
+                        "pc=s" => \$printCycle,
+                        "bluesim=s" => \$bluesimCmd,
+                        "vcdstart=i" => \$vcdStart,
+                        "vcdcycles=i" => \$vcdCycles,
+                       );
+
+# Put quotation marks back on arguments that have spaces since they will be
+# passed through a shell once more.
+foreach my $i ( 0 .. $#ARGV ) {
+    if (($ARGV[$i] =~ /\s/) && ! ($ARGV[$i] =~ /['"]$/)) {
+        $ARGV[$i] = '"' . $ARGV[$i] . '"';
+    }
+}
+
+if ($onlyCompare != 0) {
+    exit(CompareOutput());
+}
+
+# Examine subordinte builds.
+# really we should do this for all builds.  
+my @pidlist = ();
+
+if(defined($timeout)) {
+    my $timeoutPID = fork();
+
+    if ($timeoutPID != 0) { 
+        sleep($timeout);
+        kill(10,$timeoutPID);
+        # Wait for child to die.
+        waitpid($timeoutPID, 0);
+        sleep(1);
+        exit(0);
+    }
+
+    $SIG{'USR1'} = sub {
+        for my $pid (@pidlist) {
+            #Terminate with extreme prejudice
+            kill(-9,getpgrp($pid));
+        }
+        exit(0);
+    };
+
+}
+
+my $existsFPGA = 0;
+my $existsBLUESIM = 0;
+
+# The run script allows have multiple types for the same apm and multiple, hence each here.
+# This accomodate legacy builds.  If multiple types are assigned to the same APM, 
+# then their directory and master (soon to be deprecated) will go away. 
+for my $platform (@$platforms_ref) {
+
+    if ($platform->{"type"} eq "FPGA") {
+        $existsFPGA = 1;
+    }
+
+    if ($platform->{"type"} eq "BLUESIM") {
+        $existsFPGA = 1;
+    }
+}
+
+if ($help || ! $status) {
+    print STDERR "\nArguments:\n";
+    print STDERR "   [--gdb]                 Invokes the software side in gdb\n";
+    print STDERR "   [--noprogram]           Skips the FPGA load and reservation steps\n";
+    print STDERR "   [--noreserve]           Skips the FPGA reservation steps\n";
+    print STDERR "   [--onlycompare]         Only compare output files (without running)\n";
+    print STDERR "   [--nocompare]           Skip comparison of output files\n";
+
+    if ($existsFPGA) {
+        print STDERR "   [--force-load]          Load a bitfile to the FPGA even if it has errors\n";
+    }
+
+    if ($existsBLUESIM) {
+        print STDERR "   [--vcdstart=<cycle>]    Generate VCD dump for wave viewer (e.g. gtkwave)\n";
+        print STDERR "   [--vcdcycles=<cycles>]  VCD dump length (default = 20000)\n";
+    }
+
+    for my $platform (@$platforms_ref) {
+        if ($platform->{"type"} eq "CPU") {
+	    my $directory = $platform->{"directory"};
+   	    my $platformName = $platform->{"name"};
+            my $cmd = "$config{modelDir}/${directory}/sw/obj/${platformName}_sw.exe --help-run-append";
+            $ENV{LD_LIBRARY_PATH} = "$ENV{LD_LIBRARY_PATH}:$config{modelDir}/${directory}/sw/obj/"; 
+            system($cmd);
+	}
+    }
+
+    exit(1);
+}
+
+# Create a stats file for null workloads to make regression.launcher happy (HACK)
+if ($fakeStats) {
+  system("touch null.stats");
+  exit(0);
+}
+
+#############################################################################
+#############################################################################
+##
+## Adjust model arguments
+##
+#############################################################################
+#############################################################################
+
+#
+# Bluesim arguments
+#
+
+# Generate dump.vcd for wave viewer (e.g. gtkwave)?
+if (defined($vcdStart)) {
+    my $vcdCmd = "sim vcd on; sim step $vcdCycles; sim stop";
+    if ($vcdStart > 0) {
+        $vcdCmd = "sim step ${vcdStart}; ${vcdCmd}";
+    }
+
+    if (defined($bluesimCmd)) {
+        $bluesimCmd .= " ";
+    }
+    else {
+        $bluesimCmd = "";
+    }
+    $bluesimCmd .= "-c \"$vcdCmd\"";
+}
+
+#############################################################################
+#############################################################################
+##
+## Load the FPGA and run the model
+##
+#############################################################################
+#############################################################################
+
+#
+# Move old stats file so we are sure statistics come from this run
+#
+if (-f "$config{workload}.stats") {
+    rename("$config{workload}.stats", "$config{workload}.stats.old");
+}
+
+my $fpga_dev_id = undef;
+my $fpga_dev = undef;
+
+# There are three distinct phases of programming the FPGA:
+# 1) Program
+# 2) Deactivate (used as a synchronization barrier in multiFPGA
+# 3) Activate
+# After this we can run programs
+
+#set of FPGAs
+my @FPGAs = ();
+
+
+my $cpuPlatform = undef;
+my $fpgaDevLegacy = undef; # keep this around as a legacy support 
+my %fpgaDevs = ();
+
+# Need to check for existance of master for handling legacy builds.
+# If we have a master, we should not pass in platform arguments for 
+# other FPGAs.
+my $masterExists = 0;
+for my $platform (@$platforms_ref) {
+    $masterExists = $masterExists || ($platform->{"master"} eq "True");
+} 
+
+for my $platform (@$platforms_ref) {
+    my $platformType = $platform->{"type"};
+    my $platformName = $platform->{"name"};
+    my $platformLogicalName = $platform->{"logicalName"};
+    my $directory = $platform->{"directory"};
+    my $master = $platform->{"master"} eq "True";
+    
+    if ($platformType eq "BLUESIM") {
+        if(!$masterExists) 
+        {
+            $fpgaDevs{$platformLogicalName} = $platformLogicalName;
+	}
+
+        my $pid = fork();
+        if ($pid == 0) { 
+            setpgrp; 
+
+            if (! defined($bluesimCmd)) {
+                $bluesimCmd = "";
+            }
+
+            # To sandbox our executables, we put them in platform-specific directories
+            `mkdir -p ${platformName}/leap_debug`;
+            $ENV{PLATFORM_DIRECTORY} = "../$config{modelDir}/${directory}/";
+            exec("cd ${platformName}; unbuffer ../$config{modelDir}/${directory}/${platformName}_hw.exe $bluesimCmd 2>&1 | tee ${platformName}.log");    
+
+            exit(0); # in case we get here    
+        }
+        push(@pidlist, $pid);
+    }
+
+    # need to program, but not activate slave devices  
+    if ($platformType eq "FPGA") {    
+        # reading the slave configuration stomps the master config.
+        # we'll have to restore it later.
+        ReadConfig("$config{modelDir}/${directory}/config/fpga.sh", 0);
+        ReadConfig("$config{modelDir}/${directory}/config/signature.sh", 0);
+        my $fpga_type = "DEFAULT";
+        if (exists($config{FPGA})) {
+            $fpga_type = $config{FPGA};
+        }
+
+        my $fpga_dev_id = ReserveFPGA($fpga_type);
+        
+        push(@FPGAs,$fpga_dev_id); 
+
+        ProgramFPGA("$config{modelDir}/${directory}",$platformName,$fpga_dev_id);
+        # Deactivate the FPGA, so that others may program.
+        DeactivateFPGA($fpga_dev_id);
+
+        # FPGA device file path is currently passed as an environment variable.
+        # Figure out the path of the assigned FPGA.
+        if ($master) {
+            $fpga_dev = ExecRead("leap-fpga-ctrl --device-id=${fpga_dev_id} --getconfig=dev", "Failed to query FPGA device configuration");
+            $fpgaDevLegacy .= " --param FPGA_DEV_PATH=\"${fpga_dev}\"";
+        }
+        elsif(!$masterExists) 
+        {
+            $fpga_dev = ExecRead("leap-fpga-ctrl --device-id=${fpga_dev_id} --getconfig=dev", "Failed to query FPGA device configuration");
+            $fpgaDevs{$platformLogicalName} = $fpga_dev;
+	}
+        else
+        {
+            $fpga_dev = ExecRead("leap-fpga-ctrl --device-id=${fpga_dev_id} --getconfig=dev", "Failed to query FPGA device configuration");
+	}
+    }
+
+    if ($platformType eq "CPU") {
+	if (defined($cpuPlatform)) {
+            print "We currently support only one CPU platform\n";
+            exit(0);
+	}
+        $cpuPlatform = $platform;
+    }
+
+}
+
+
+# Let's activate all of the FPGAs.
+for my $device_id (@FPGAs) {
+    ActivateFPGA($device_id);
+}
+
+
+# Run the software side or a hardware simulator
+my $run_status = 0;
+if (defined($cpuPlatform)) {
+    my $platformName = $cpuPlatform->{"name"};
+    my $directory = $cpuPlatform->{"directory"};
+
+    # Set library path to ensure that we pick up our shared library.
+    $ENV{LD_LIBRARY_PATH} = "$ENV{LD_LIBRARY_PATH}:$config{modelDir}/${directory}/sw/obj/"; 
+
+    # build up a commandline for the main model executable.
+    my $cmd;
+
+    # Model might be a link to a binary.  Some binaries expect to find libraries
+    # based on their command line name (e.g. Bluesim).
+ 
+    $cmd = "$config{modelDir}/${directory}/sw/obj/${platformName}_sw.exe";
+    if (-l $cmd) {
+        $cmd = "$config{modelDir}/${directory}/" . readlink($cmd);
+    }
+
+
+    $cmd .= " --modeldir=$config{modelDir}/${directory} --workload=$config{workload} $config{genFlags}";
+    foreach my $c (@ARGV) {
+        $cmd .= " $c";
+    }
+
+    if (defined($printCycle)) {
+        $cmd .= " --pc=${printCycle}";
+    }
+
+    if (defined($fpgaDevLegacy)) {
+	$cmd .= $fpgaDevLegacy;
+    }
+
+    # add in FPGA dev manifest
+    if(keys(%fpgaDevs)) {
+        my $deviceDictionary = "";
+
+        for my $device ( keys(%fpgaDevs)) {
+            $deviceDictionary .= "$device:\\\"$fpgaDevs{$device}\\\",";
+        }
+
+        $cmd .= " --DEVICE_DICTIONARY=$deviceDictionary ";
+    }
+
+    # Define the global string database. These are collected with each build.
+    for my $platform (@$platforms_ref) {
+        my $directory = $platform->{"directory"};
+        my $platformName = $platform->{"name"};
+        my $str = "$config{modelDir}/${directory}/${platformName}.str";
+        if (-f "${str}") {
+            $cmd .= " --global-strings=\'${str}\'";
+        }
+    }
+
+    $run_status = ExecModel($cmd);
+}
+
+# and now that we are done we will tear down the subordinate platforms
+for my $pid (@pidlist) {
+    #Terminate with extreme prejudice
+    kill(-9,getpgrp($pid));
+}
+
+# Create a stats file for null workloads to make regression.launcher happy (HACK)
+if ( $config{workload} eq "null") {
+  system("touch null.stats");
+}
+
+if (-f "leap_events.out") {
+    system("sort leap_events.out -o leap_events.out.$$; mv -f leap_events.out.$$ leap_events.out");
+}
+if (-f "$config{workload}.stats") {
+    system("sort $config{workload}.stats -o $config{workload}.stats.$$; mv -f $config{workload}.stats.$$ $config{workload}.stats");
+}
+
+if ($existsFPGA && ! $noProgram && ! $noReserve) {
+    for my $device_id (@FPGAs) {
+        Exec("leap-fpga-ctrl --device-id=${device_id} --drop-reservation", "Failed to drop FPGA reservation");
+    }
+}
+
+if ($run_status != 0) {
+    exit($run_status);
+}
+else {
+    exit(CompareOutput());
+}
+
+
+sub ErrorExit($) {
+    my $msg = shift;
+
+    print STDERR "${msg}\n";
+    if ($existsFPGA && ! $noProgram && ! $noReserve) {
+        for my $device_id (@FPGAs) {
+            system("leap-fpga-ctrl --device-id=${device_id} --drop-reservation");
+	}
+    }
+
+    exit(1);
+}
+
+
+##
+## ExecModel --
+##   This is the routine that actually invokes the model.  stdout and stderr
+##   are logged in a file.  The return value is the exit status of the model.
+##
+sub ExecModel($) {
+    my $cmd = shift;
+
+    if ($gdb) {
+        ## gdb needs stdin.  Just use system() and don't do logging.
+        system("gdb -args " . $cmd);
+        return 0;
+    }
+
+    ##
+    ## Invoke the model, but log its output both to stdout and to a file.
+    ## Use a pty so the invoked program will use line buffering instead
+    ## of fully buffered writes.  (Libc sets up stdout line buffered when
+    ## it thinks it is writing to a terminal.  It uses fully buffered
+    ## writing to a pipe.)
+    ##
+
+    my $pty = new IO::Pty;
+    my $slave = $pty->slave();
+
+    my $pid = fork();
+    die "Couldn't fork: $!" unless defined $pid;
+
+    if (! $pid) {
+        # Child process is the monitoring process
+        $pty->make_slave_controlling_terminal();
+
+        if (! open(LOG, ">$config{workload}.out")) {
+            print STDERR "Error opening log file $config{workload}.out\n";
+        }
+
+        # Unbuffered I/O loop
+        while (1) {
+            my $buf;
+            my $n = sysread($slave, $buf, 4096);
+
+            last if ($n == 0);
+
+            syswrite(STDOUT, $buf);
+            syswrite(LOG, $buf);
+        }
+
+        close(LOG);
+        exit(0);
+    }
+
+    # Bind new PTY to STDOUT (but save old STDOUT)
+    $pty->close_slave();
+    open(my $oldOut, ">&", STDOUT) or die $!;
+    open(STDOUT, ">&", $pty) or die $!;
+
+    # Run model
+    my $result = system("${cmd} 2>&1");
+
+    # Send ^d to end child logging thread
+    print "\cD";
+
+    # Return to normal STDOUT
+    close(STDOUT);
+    open(STDOUT, ">&", $oldOut) or die $!;
+    close($oldOut);
+
+    # Compute exit status of model
+    my $status = 0;
+    if ($result == -1) {
+        print STDERR "Model execution failed\n";
+        $status = 1;
+    }
+    elsif ($result & 127) {
+        print STDERR "Child died with signal " . ($result & 127) . ", " . (($result & 128) ? 'with' : 'without') . " coredump\n";
+        $status = 1;
+    }
+    elsif (($result >> 8) != 0) {
+        $status = $result >> 8;
+        print "Model exited with status $status\n";
+    }
+
+    return $status;
+}
+
+
+sub Exec($$) {
+    my $cmd = shift;
+    my $errmsg = shift;
+    
+    system($cmd);
+    if ($? == -1) {
+        ErrorExit("Failed to execute $cmd: $!");
+    }
+    elsif ($? & 127) {
+        ErrorExit("Child died with signal " . ($? & 127) . ", " . (($? & 128) ? 'with' : 'without') . " coredump");
+    }
+    elsif (($? >> 8) != 0) {
+        ErrorExit("${errmsg}");
+    }
+}
+
+
+##
+## ExecRead --
+##   Same as Exec() but returns the output from stdout.
+##
+sub ExecRead($$) {
+    my $cmd = shift;
+    my $errmsg = shift;
+    
+    my $r = `$cmd`;
+    if ($? == -1) {
+        ErrorExit("Failed to execute $cmd: $!");
+    }
+    elsif ($? & 127) {
+        ErrorExit("Child died with signal " . ($? & 127) . ", " . (($? & 128) ? 'with' : 'without') . " coredump");
+    }
+    elsif (($? >> 8) != 0) {
+        ErrorExit("${errmsg}");
+    }
+
+    chomp($r);
+    return $r;
+}
+
+
+sub CompareOutput() {
+    return 0 if ($noCompare != 0);
+    return 0 if (! exists($config{compare}) || ($config{compare} eq ''));
+
+    my $result = 0;
+        foreach my $cmp (split(':', $config{compare})) {
+            system("cd program; $cmp");
+            if ($? == -1) {
+                ErrorExit("Failed to execute $cmp: $!");
+            }
+            elsif ($? & 127) {
+                ErrorExit("Child died with signal " . ($? & 127) . ", " . (($? & 128) ? 'with' : 'without') . " coredump");
+            }
+            elsif (($? >> 8) != 0) {
+                $result = $? >> 8;
+            }
+        }
+
+
+    if ($result == 0) {
+        print "*** Output comparison passed ***\n";
+    }
+    else {
+        print "*** Output comparison failed ***\n";
+    }
+
+    return $result;
+}
+
+
+#
+# Read the configuration file
+#
+sub ReadConfig($$) {
+    my $conf = shift;
+    my $required = shift;
+    my $status = open(CONFIG, "< $conf");
+    if (! $status) {
+        return if (! $required);
+        die("Failed to open $conf");
+    }
+
+    while (<CONFIG>) {
+        chomp;
+        my $t = $_;
+        $t =~ s/#.*//; # remove comments
+        if ($t =~ /^\s*([a-zA-Z_0-9]+)\s*=(.*)$/) {
+            my $c = $1;
+            # this allows us the full expressivity of perl, 
+            # without needing to parse it. 
+            my $v = eval($2);
+            $config{$c} = $v;
+        } 
+    }
+}
+
+sub ProgramFPGA($$$) {
+    # Need to know which bitfile on which to operate
+    my $path = shift; 
+    my $model = shift; 
+    my $fpga_dev_id = shift;
+    $ENV{FPGA_BIT_FILE} = "$path/.xilinx/${model}_par.bit";
+
+        if (! $forceLoad && -s "$path/${model}_hw.errinfo") {
+            print STDERR "FPGA bit file has errors:\n\n";
+            system("cat $path/${model}_hw.errinfo > /dev/stderr");
+            ErrorExit("\nUse --force-load to ignore the error.\n");
+        }
+
+        # Does a download script exist to program the FPGA?
+        my $needProgram = (-f "$path/config/${model}.download");
+
+        # Is the FPGA already programmed with the correct bit file and does it support soft reset?
+        if (exists($config{signature}) && $config{SOFT_RESET}) {
+            my $curSignature = ExecRead("leap-fpga-ctrl --device-id=${fpga_dev_id} --getsignature",
+                                        "Failed to read code signature");
+            if ($curSignature eq $config{signature}) {
+                print "FPGA is already programmed (signature match)...\n";
+                $needProgram = 0;
+            }
+        }
+
+        if ($needProgram) {
+	    $SIG{'INT'} = 'IGNORE'; # Ctrl-c during a program wrecks the Xilinx programming cable.
+            Exec("leap-fpga-ctrl --device-id=${fpga_dev_id} --program", "Failed to enter FPGA programming mode");
+            my $dir = `pwd`;
+            chomp($dir);
+            Exec("(cd $path; ./config/${model}.download --device-id=${fpga_dev_id} ${dir}/FPGA_programming.log)", "Failed to program FPGA");
+            if (exists($config{signature})) {
+                Exec("leap-fpga-ctrl --device-id=${fpga_dev_id} --setsignature=$config{signature}", "Failed to set FPGA bit image signature");
+            }
+	    $SIG{'INT'} = 'DEFAULT'; # Ctrl-c during a program wrecks the Xilinx programming cable.
+        }
+
+
+}
+
+sub ReserveFPGA($) {
+    my $fpga_type = shift;
+    my $fpga_dev_id = -1; # Error case
+        
+    my $res = "--reserve";
+    if ($fpga_type ne "DEFAULT") {
+        $res .= "=$fpga_type";
+    }
+    print "Reserving $fpga_type\n";
+    $fpga_dev_id = ExecRead("leap-fpga-ctrl ${res}", "Failed to reserve FPGA");
+    return $fpga_dev_id;
+}
+
+sub ActivateFPGA($) {
+    my $fpga_dev_id = shift;
+    Exec("leap-fpga-ctrl --device-id=${fpga_dev_id} --activate", "Failed to activate FPGA or driver");
+}
+
+sub DeactivateFPGA($) {
+    my $fpga_dev_id = shift;
+    Exec("leap-fpga-ctrl --device-id=${fpga_dev_id} --deactivate", "Failed to activate FPGA or driver");
+}

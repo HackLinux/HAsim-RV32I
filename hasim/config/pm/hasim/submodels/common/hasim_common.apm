@@ -1,0 +1,37 @@
+
+[Global]
+SaveParameters=0
+Description=HAsim Common Library as a submodel
+File=hasim_common
+Version=2.2
+Name=HAsim Common Default Configuration
+Type=HAsim
+Class=Asim::Model
+DefaultBenchmark=
+RootName=Default HAsim Common Library
+RootProvides=hasim_common
+DefaultRunOpts=
+
+[Model]
+DefaultAttributes=hasim
+model=Default HAsim Common Library
+
+
+
+
+
+
+
+
+[Hasim Common Library]
+
+[Hasim Common Library/Requires]
+
+
+
+
+
+
+[Default HAsim Common Library]
+File=modules/hasim/util/common/hasim-common.awb
+Packagehint=hasim

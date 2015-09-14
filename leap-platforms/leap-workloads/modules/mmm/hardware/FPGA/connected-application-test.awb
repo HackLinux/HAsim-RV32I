@@ -1,0 +1,28 @@
+%name Matrix matrix multiply application
+%desc Matrix matrix multiplication
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%requires mmm_controller
+%requires mmm_common
+%requires mmm_functional_unit
+%requires mmm_functional_unit_network
+%requires mmm_memory_unit
+%requires mmm_memory_switch
+
+%public  Multiplier.bsv
+%public  multiply.dic
+%public  connected-application-test.h
+%public  connected-application-test.cpp
+%public  instructions.h
+%public  instructionParameters.h
+%public  matrixPointers.h
+
+%library libglib-2.0.a
+%library libgthread-2.0.a
+%library librt.a
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

@@ -1,0 +1,17 @@
+%name Central Cache Service
+%desc Central Cache Service
+
+%provides central_cache_service
+%requires central_cache_common
+%requires central_cache
+
+%attributes hybrid connected
+
+%notes README
+
+%public central-cache-service.bsh
+%public central-cache-service.bsv
+
+%param SYNTH_BOUNDARY mkCentralCacheService "Name of synthesis boundary"
+%param --global central_cache_service_PROVIDES central_cache_service "central_cache_service"
+

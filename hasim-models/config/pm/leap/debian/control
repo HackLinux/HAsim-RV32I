@@ -1,0 +1,31 @@
+Source: leap
+Section: devel
+Priority: optional
+Maintainer: Kermin Fleming <kermin.fleming@gmail.com>
+Build-Depends: debhelper (>= 7), autotools-dev, libqt4-dev
+Standards-Version: 3.7.2
+
+Package: leap
+Architecture: all
+Depends: leap-15.02
+Recommends: leap-14.08
+Description: Dependency package for Leap FPGA environment
+ Dependency package for the Leap FPGA environment
+Section: devel
+
+Package: leap-15.02
+Architecture: any
+Depends: leap-bin, ${misc:Depends}
+Description: Sharable package for the LEAP
+ AWB modules for the logic-based environment for application programmaing (leap)
+Section: devel
+
+Package: leap-bin
+Architecture: any
+Depends: leap-platforms, asim-core, asim-core-dev, awb, ${perlqt:Depends}, libterm-readline-gnu-perl, libio-pty-perl, python-ply, python-pygraph, python-glpk, libtbb-dev, iverilog, expect-dev, scons, libboost-dev, ${misc:Depends}
+Replaces: leap (<= 0.6.0)
+Breaks: leap (<= 0.6.0)
+Description: Executables for the LEAP FPGA environement
+ Core executables for LEAP FPGA environment
+Section: devel
+

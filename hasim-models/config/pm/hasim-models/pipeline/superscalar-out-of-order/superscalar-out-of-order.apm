@@ -1,0 +1,69 @@
+
+[Global]
+SaveParameters=0
+Description=Superscalar out-of-order pipeline
+File=superscalar-out-of-order
+Version=2.2
+Name=Superscalar out-of-order pipeline
+Type=HAsim
+Class=Asim::Model
+DefaultBenchmark=
+DefaultRunOpts=
+RootName=Hasim 6-stage CPU
+RootProvides=hasim_pipeline
+
+[Model]
+DefaultAttributes=hasim
+model=Hasim 6-stage CPU
+
+[Hasim commit]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/commit.awb
+Packagehint=hasim-models
+
+[Hasim decode]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/decode.awb
+Packagehint=hasim-models
+
+[Hasim mem]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/mem.awb
+Packagehint=hasim-models
+
+[Hasim out-of-order issue]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/rob.awb
+Packagehint=hasim-models
+
+[Hasim fetch]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/fetch.awb
+Packagehint=hasim-models
+
+[Hasim ALU]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/alu.awb
+Packagehint=hasim-models
+
+[Hasim 6-stage CPU]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/pipeline-6-stage.awb
+Packagehint=hasim-models
+
+[Hasim 6-stage CPU/Requires]
+hasim_commit=Hasim commit
+hasim_mem=Hasim mem
+hasim_issue=Hasim out-of-order issue
+hasim_fetch=Hasim fetch
+hasim_decode=Hasim decode
+hasim_alu=Hasim ALU
+hasim_branch_pred_alg=n-Bit Branch Predictor Algorithm
+pipeline_base_types=OOO pipeline types
+model_structures_base_types=Model Structures Base Types
+
+
+[OOO pipeline types]
+File=modules/hasim/timing-models/pipeline/superscalar-out-of-order/pipeline-6-stage-types.awb
+Packagehint=hasim-models
+
+[Model Structures Base Types]
+File=modules/hasim/timing-models/structures/base-types/model-structures-base-types.awb
+Packagehint=hasim-models
+
+[n-Bit Branch Predictor Algorithm]
+File=modules/hasim/timing-models/structures/branch/predictor/n-bit/n-bit-bp-alg.awb
+Packagehint=hasim-models

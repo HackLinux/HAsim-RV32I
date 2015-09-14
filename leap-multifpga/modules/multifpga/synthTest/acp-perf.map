@@ -1,0 +1,9 @@
+model -> ACP0;
+common_services -> ACP0;
+connected_application -> ACP0;
+hardware_system -> ACP0;
+test_a -> ACP1;
+test_c -> ACP1;
+test_b -> ACP0;
+test_d -> ACP0;
+

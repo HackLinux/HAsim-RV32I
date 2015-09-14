@@ -1,0 +1,24 @@
+%AWB_START
+
+%name Hasim 6-stage CPU
+%desc Hasim 6-stage CPU
+%requires hasim_fetch
+%requires hasim_decode
+%requires hasim_issue
+%requires hasim_alu
+%requires hasim_mem
+%requires hasim_commit
+%requires hasim_branch_pred_alg
+%requires pipeline_base_types
+%requires model_structures_base_types
+%provides hasim_pipeline
+
+%attributes hasim
+
+%public pipeline-6-stage.bsv
+%public pipeline-6-stage.h
+%public get-results.bsv
+
+%param SYNTH_BOUNDARY mkPipeline "Name of synthesis boundary"
+
+%AWB_END

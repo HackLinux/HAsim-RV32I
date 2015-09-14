@@ -1,0 +1,11 @@
+service MMMCONTROLRRR
+{
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+       method PutInstruction(in UINT64[64] instruction, out UINT64[64] response);
+       method Execute(in UINT64[64] instruction, out UINT64[64] response);
+    };
+}
+
+
+

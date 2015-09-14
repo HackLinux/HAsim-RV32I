@@ -1,0 +1,18 @@
+#/********************************************************************
+#* Python libraries for XST synthesis tool
+#********************************************************************/
+
+%name Interface builder
+%desc Build tool for LEAP interfaces
+
+%attributes tool
+
+%provides iface_tool
+
+%notes README
+
+%scons %library iface.py
+
+%param --global EXTRA_DICTS " " "A set of extra dictionary files"
+%param --global EXTRA_INC_DIRS " " "A set of include directories"
+%param --global EXTRA_RRRS  " " "A set of extra rrr files"

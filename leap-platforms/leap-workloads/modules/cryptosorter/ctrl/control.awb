@@ -1,0 +1,12 @@
+%name Cryptosorter Top level control
+%desc top level control for the cryptosorter block
+
+%provides cryptosorter_control
+
+%public  mkCtrl.bsv
+
+
+
+
+
+

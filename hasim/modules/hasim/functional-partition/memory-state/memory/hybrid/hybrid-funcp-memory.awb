@@ -1,0 +1,18 @@
+%name Hybrid Memory for Functional Partition
+%desc Hybrid Memory for Functional Partition
+
+%provides funcp_memory
+%requires funcp_simulated_memory
+
+%public   hybrid-funcp-memory-datatypes.bsv
+%public   hybrid-funcp-memory.bsv
+%private  hybrid-funcp-memory.cpp
+%public   hybrid-funcp-memory.h
+%private  hybrid-funcp-memory.rrr
+%public   hybrid-funcp-memory.dic
+%sources -t LOG -v PUBLIC hybrid-funcp-memory.log 
+
+%param FUNCP_CACHELINE_BITS     256 "Cache line size in bits"
+%param --global  FUNCP_PVT_CACHE_ENTRIES          4096 "Number of entries in functional private cache"
+%param --dynamic FUNCP_MEM_PVT_CACHE_MODE            0 "Bits 1-0: 0 write-back, 1 write-through, 2 write-no-allocate, 3 disabled"
+%param --dynamic FUNCP_MEM_PVT_PREFETCH_MODE         0 "Bit 2: fill from host disable (1), Bit 1: prefetch all (1) / only instructions (0), Bit 0: prefetcher enable (1)"

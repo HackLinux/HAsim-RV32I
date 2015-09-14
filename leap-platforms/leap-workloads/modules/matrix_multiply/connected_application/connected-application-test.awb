@@ -1,0 +1,16 @@
+%name Matrix Matrix Multiplication Connected Application
+%desc Matrix Matrix Multiplication Connected Application
+
+%attributes slave connected hybrid
+
+%provides connected_application
+
+%requires matrix_multiply_system
+
+%sources -t BSV -v PUBLIC  connected-application-test.bsv
+%sources -t H   -v PUBLIC  connected-application-test.h  
+%sources -t CPP -v PRIVATE connected-application-test.cpp
+%sources -t LOG -v PUBLIC  connected-application-test.log
+
+%param SYNTH_BOUNDARY mkConnectedApplication "name of synthesis boundary"
+

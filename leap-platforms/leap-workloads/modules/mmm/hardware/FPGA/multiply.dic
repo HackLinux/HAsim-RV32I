@@ -1,0 +1,4 @@
+def VDEV.SCRATCH.MATRIXA     "matrixA";
+def VDEV.SCRATCH.MATRIXB     "matrixB";
+def VDEV.SCRATCH.MATRIXC     "matrixC";
+def VDEV.SCRATCH.SCRATCH     "Scratch";

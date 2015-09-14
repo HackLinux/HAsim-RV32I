@@ -1,0 +1,3 @@
+Compilation message: "XXX", line 129, column 219: Dangling Recv {Bit#(128)} [3]:FPGATOCPU:False:128:cpu0:None
+Compilation message: "XXX", line 129, column 219: Dangling Send {Bit#(128)} [3]:CPUTOFPGA:False:128:cpu0:None
+

@@ -1,0 +1,15 @@
+%name Cartesian-Polar interpolator
+%desc Converts a cartesian represetation into a representation in the polar domain.
+
+%provides connected_application
+
+%requires cartpol_common
+%requires cartpol_cache
+%requires cartpol_core
+
+%public CartPolTesterCore.bsv
+%public Control.rrr
+%public connected-application-test.cpp  
+%public connected-application-test.h 
+
+

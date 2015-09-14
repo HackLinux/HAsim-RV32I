@@ -1,0 +1,62 @@
+#!/bin/sh
+
+##############################################################
+#
+# Benchmark setup for bluespec design
+#
+# Usage: setup-bmark-smips <srcdir> <destdir> <bmark>
+#
+# Setup benchmark to run in <destdir> 
+#
+##############################################################
+
+
+# 1. Build Benchmark in $destdir
+# 2. Create $destdir/run
+
+if [ $# -ne 3 ]; then
+   echo Usage $0 "<srcdir> <destdir> <bmark>"
+   echo $*
+   exit 1
+fi
+
+bmark=$1
+srcdir=$2
+destdir=$3
+
+# echo "BMARK: $bmark"
+# echo "SRC: $srcdir"
+# echo "DST: $destdir"
+
+echo "Go to $destdir"
+cd $destdir
+
+echo "Creating simlinks"
+
+if [ -e "../../pm/simx" ]
+then
+  /bin/ln -f -s ../../pm/simx .
+  progname="./simx"
+else
+  /bin/ln -f -s ../../pm/simv .
+  progname="./simv"
+fi
+
+if [ -d "../../pm/simv.daidir" ]
+then
+  /bin/ln -f -s ../../pm/simv.daidir .
+fi
+
+#
+# Create run script with variable substition on run template
+#    Note: we can't substitute strings with a * in them
+
+echo "Creating run script"
+cp $srcdir/run.pl run
+sed -i "s*<<<SCRIPT>>>*$0*"          run
+sed -i "s*<<<PROGRAM>>>*$progname*"   run
+sed -i "s*<<<BENCHMARK>>>*$bmark*"   run
+
+chmod +x run
+
+exit 0

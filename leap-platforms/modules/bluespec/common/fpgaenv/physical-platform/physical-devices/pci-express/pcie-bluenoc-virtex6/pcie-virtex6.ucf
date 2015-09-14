@@ -1,0 +1,88 @@
+##
+## Started with Bluespec's configuration file, modified for LEAP.
+##
+
+######################################################################################################
+# PIN ASSIGNMENTS
+######################################################################################################
+
+NET    "pcieWires_leds[7]"                              LOC = AD24 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[6]"                              LOC = AE24 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[5]"                              LOC = AG23 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[4]"                              LOC = AB23 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[3]"                              LOC = AE23 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[2]"                              LOC = AE22 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[1]"                              LOC = AC24 | IOSTANDARD = LVCMOS25 ;
+NET    "pcieWires_leds[0]"                              LOC = AC22 | IOSTANDARD = LVCMOS25 ;
+
+NET    "pcieWires_rst_put"                              LOC = AE13 | PULLUP | NODELAY | TIG ;
+NET    "pcieWires_clk_p_put"                            LOC = P6 ;
+NET    "pcieWires_clk_n_put"                            LOC = P5 ;
+
+
+######################################################################################################
+# CLOCK CONSTRAINTS
+######################################################################################################
+
+NET    "pcieWires_clk_*_put" TNM_NET = TG_pci_sys_clk;
+TIMESPEC TS_pci_sys_clk = PERIOD TG_pci_sys_clk 100 MHz HIGH 50%;
+
+NET    "*ep/ep/pcie_clocking_i/clk_250" TNM_NET = TG_trn_clk_250;
+TIMESPEC TS_trn_clk_250 = PERIOD TG_trn_clk_250 TS_pci_sys_clk*2.5 HIGH 50 % PRIORITY 1;
+
+NET    "*ep/ep/pcie_clocking_i/clk_125" TNM_NET = TG_trn_clk_125;
+TIMESPEC TS_trn_clk_125 = PERIOD TG_trn_clk_125 TS_pci_sys_clk*1.25 HIGH 50 % PRIORITY 100;
+
+PIN    "*ep/ep/trn_reset_n_int_i.CLR"                   TIG;
+PIN    "*ep/ep/trn_reset_n_i.CLR"                       TIG;
+PIN    "*ep/ep/pcie_clocking_i/mmcm_adv_i.RST"          TIG;
+#TIMESPEC "TS_RESETN" = FROM FFS(*) TO FFS(trn_reset_n_i) 8 ns;
+
+INST "*_pcieLLDev_deviceClocked/dev/fifoRxData_elem*"       TNM=TG_trn_clk_125;
+INST "*_pcieLLDev_deviceClocked/dev/fifoRxData_block*"      TNM=TG_trn_clk_250;
+
+INST "*_pcieLLDev_deviceClocked/dev/fifoTxData_*elem*"      TNM=TG_trn_clk_250;
+INST "*_pcieLLDev_deviceClocked/dev/fifoTxData_*block*"     TNM=TG_trn_clk_125;
+
+# These are set conservatively at 250 MHz.  Could probably be 125 MHz but
+# timing is easy to meet.  Without them, the null crossing registers in
+# the gearbox appear to have a 0 time requirement.
+TIMESPEC TS_trn_clk_125_to_250=FROM TG_trn_clk_125 TO TG_trn_clk_250 4ns DATAPATHONLY;
+TIMESPEC TS_trn_clk_250_to_125=FROM TG_trn_clk_250 TO TG_trn_clk_125 4ns DATAPATHONLY;
+
+
+######################################################################################################
+# LOC ASSIGNMENTS
+######################################################################################################
+
+# PCEe block placement
+INST "*ep/ep/pcie_2_0_i/pcie_block_i"                   LOC = PCIE_X0Y1;
+
+# MMCM placment
+INST "*ep/ep/pcie_clocking_i/mmcm_adv_i"                LOC = MMCM_ADV_X0Y7;
+
+# PCIe lanes
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[0].GTX" LOC = GTXE1_X0Y15;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[1].GTX" LOC = GTXE1_X0Y14;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[2].GTX" LOC = GTXE1_X0Y13;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[3].GTX" LOC = GTXE1_X0Y12;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[4].GTX" LOC = GTXE1_X0Y11;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[5].GTX" LOC = GTXE1_X0Y10;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[6].GTX" LOC = GTXE1_X0Y9;
+INST "*ep/ep/pcie_2_0_i/pcie_gt_i/gtx_v6_i/GTXD[7].GTX" LOC = GTXE1_X0Y8;
+
+
+######################################################################################################
+# AREA ASSIGNMENTS
+######################################################################################################
+
+INST "*_pcieLLDev_deviceClocked/dev/*"        AREA_GROUP = "AG_pcie_ep";
+INST "*_pcieLLDev_pcieSysClk*"  AREA_GROUP = "AG_pcie_ep";
+AREA_GROUP "AG_pcie_ep"         RANGE = SLICE_X132Y105:SLICE_X159Y144;
+AREA_GROUP "AG_pcie_ep"         GROUP = CLOSED;
+
+INST "*_pcieLLDev_deviceClocked/dev/bridge/*" AREA_GROUP = "AG_pcie_bridge";
+INST "*_pcieLLDev_deviceClocked/extPorts*"    AREA_GROUP = "AG_pcie_bridge";
+AREA_GROUP "AG_pcie_bridge"     RANGE = SLICE_X116Y34:SLICE_X159Y103;
+AREA_GROUP "AG_pcie_bridge"     GROUP = CLOSED;
+

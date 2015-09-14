@@ -1,0 +1,10 @@
+model -> sim0;
+common_services -> sim0;
+connected_application -> sim0;
+hardware_system -> sim0;
+heat_transfer_control -> sim0;
+heat_transfer_local -> sim0;
+heat_transfer_remote1 -> sim1;
+heat_transfer_remote2 -> sim1;
+heat_transfer_remote3 -> sim2;
+

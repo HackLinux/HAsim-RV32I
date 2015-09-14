@@ -1,0 +1,26 @@
+%name Matrix Matrix Multiplication Common Module
+%desc Matrix Matrix Multiplication Common Module
+
+%attributes matrix_multiply test
+
+%provides matrix_multiply_common
+
+%public matrix-multiply-common.bsv
+%public multiplier.bsv
+%public matrix-multiply-engine.bsv
+%public matrix-multiply-memory.bsv
+
+%param --global MATRIX_MULTIPLY_NUM_ENGINES                 1  "number of engines"
+%param --global MATRIX_MULTIPLY_NUM_PARTITIONS              1  "number of partitions"
+
+%param --global MATRIX_MULTIPLY_PVT_CACHE_ENABLE            1  "0: disable, 1: enable private caches"
+%param --global MATRIX_MULTIPLY_REQ_MERGE_ENABLE            1  "0: disable, 1: enable request merging"
+
+%param --global MATRIX_MULTIPLY_RESULT_CHECK                0  "enables result checking"
+%param --global MATRIX_MULTIPLY_MATRIX_A_Z_SHAPE_ACCESS     1  "enables z shape access matrix A"
+
+%param --global MATRIX_MULTIPLY_MAX_SIZE_X               1024  "maximum matrix size x dimension"
+%param --global MATRIX_MULTIPLY_MAX_SIZE_Y               1024  "maximum matrix size y dimension"
+%param --global MATRIX_MULTIPLY_BLOCK_SIZE                 64  "matrix sub-block size"
+%param --global MATRIX_MULTIPLY_NUM_LOCAL_MULTIPLIERS      32  "number of parallel multipliers in a local engine"
+

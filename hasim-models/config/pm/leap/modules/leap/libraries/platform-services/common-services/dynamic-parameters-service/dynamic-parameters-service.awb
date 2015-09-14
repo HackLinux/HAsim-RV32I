@@ -1,0 +1,17 @@
+%name Dynamic Parameter Service
+%desc Wrap dynamic parameter device in Soft Connections
+
+%provides dynamic_parameters_service
+
+%attributes hybrid connected
+
+%notes README
+
+%public  dynamic-parameters-local.bsv 
+%public  dynamic-parameters-service.bsv 
+%public  dynamic-parameters-service.h
+%private dynamic-parameters-service.cpp
+%public  dynamic-parameters-service.rrr
+%public  dynamic-parameters-service.dic
+
+%sources -t LOG -v PUBLIC dynamic-parameters-service.log 

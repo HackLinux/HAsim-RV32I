@@ -1,0 +1,1 @@
+def VDEV.SCRATCH.DIRECT_MAPPED_WRITETHROUGH_DCACHE_TAGS "scratch_direct_mapped_writethrough_tags";

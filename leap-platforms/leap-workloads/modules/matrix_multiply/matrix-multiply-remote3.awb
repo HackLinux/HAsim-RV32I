@@ -1,0 +1,11 @@
+%name Matrix Matrix Multiplication Remote Module 3
+%desc Matrix Matrix Multiplication Remote Module 3
+
+%attributes matrix_multiply test
+
+%provides matrix_multiply_remote3
+
+%public matrix-multiply-remote3.bsv
+    
+%param SYNTH_BOUNDARY mkMatrixMultiplyRemote3 "name of synthesis boundary"
+

@@ -1,0 +1,195 @@
+# -*-Python-*-
+
+import os
+import re
+import sys
+import string
+import atexit
+import @ROOT_DIR_MODEL@ 
+import @ROOT_DIR_MODEL@.Source as Source
+import @ROOT_DIR_MODEL@.Module as Module 
+import @ROOT_DIR_MODEL@.ModuleList as ModuleList
+import build_pipeline
+
+# The LIM builder invokes SCons in a series of subdirectories.
+# LIM_BUILD_DIR indicates the directory of the current sub-build.
+# This value is used in constructing source objects, an so must be
+# initialized first.
+if 'LIM_BUILD_DIR' in ARGUMENTS:
+    model.buildDir = ARGUMENTS['LIM_BUILD_DIR']
+else:
+    model.buildDir = ''
+
+
+defs = {
+    'ALL_HW_DIRS'        : '@ALL_HW_DIRS@',
+    'APM_FILE'           : '@APM_FILE@',
+    'APM_NAME'           : '@APM_NAME@',
+    'BDPI_CS'            : '@BDPI_CS@',
+    'BSC'                : '@BSC@',
+    'BSC_FLAGS_VERILOG'  : '@BSC_FLAGS_VERILOG@',
+    'BSC_FLAGS_SIM'      : '@BSC_FLAGS_SIM@',
+    'BUILD_DIR'          : '@BUILD_DIR@',
+    'CONNECTION_SCRIPT'  : 'leap-connect',
+    'FPGA_PART_XILINX'   : '@FPGA_PART_XILINX@',
+    'GIVEN_BAS'          : '@GIVEN_BAS@',
+    'GIVEN_VHDS'         : '@GIVEN_VHDS@',
+    'GIVEN_NGCS'         : '@GIVEN_NGCS@',
+    'GIVEN_BMMS'         : '@GIVEN_BMMS@', 
+    'GIVEN_ELFS'         : '@GIVEN_ELFS@',
+    'GIVEN_CS'           : '@GIVEN_CS@',
+    'GIVEN_VERILOGS'           : '@GIVEN_VERILOGS@',
+    'GIVEN_ALTERAVS'     : '@GIVEN_ALTERA_VERILOGS@',
+    'GIVEN_XCFS'         : '@GIVEN_XCFS@',
+    'GIVEN_UCFS'         : '@GIVEN_UCFS@',
+    'GIVEN_QSFS'         : '@GIVEN_QSFS@',
+    'GIVEN_SDCS'         : '@GIVEN_SDCS@',
+    'GIVEN_DATAS'        : '@GIVEN_DATAS@',
+    'GEN_BAS'            : '@GEN_BAS@',
+    'GEN_VS'             : '@GEN_VS@',
+    'GEN_CXXS'           : 'schedule.cxx @GEN_CXXS@',
+    'GEN_HS'             : 'schedule.h @GEN_HS@',
+    'LDFLAGS'            : '-L /usr/lib64/curses -L /usr/lib/curses',
+    'M5_BUILD_DIR'       : '@M5_BUILD_DIR@',    # Defined if m5 simulator is present
+    'MAKE_ALL_TARGET'    : '@MAKE_ALL_TARGET@',
+    'MAP_OPTIONS'        : '@MAP_OPTIONS@',
+    'MODEL_ROOT'         : '@MODEL_ROOT@',
+    'MODULE_LIST'        : [@MODULE_LIST@],
+    'ROOT_DIR_MODEL'     : '@ROOT_DIR_MODEL@',
+    'ROOT_DIR_HW'        : '@ROOT_DIR_HW@',
+    'ROOT_DIR_HW_INC'    : '@ROOT_DIR_HW_INC@',
+    'ROOT_DIR_SW'        : '@ROOT_DIR_SW@',
+    'ROOT_DIR_SW_INC'    : '@ROOT_DIR_SW_INC@',
+    'SIMULATED_ISA'      : '@SIMULATED_ISA@',
+    'SW_INC_DIRS'        : '@SW_INC_DIRS@',
+    'SW_LIBS'            : '@SW_LIBS@',
+    'SW_LINK_LIBS'       : '@SW_LINK_LIBS@',
+    'SYNTH_TOP'          : '@SYNTH_TOP@',
+    'SYNTH_WRAPPERS'     : '@SYNTH_WRAPPERS@',
+    'SYNTHESIS_TOOL'     : '@SYNTHESIS_TOOL@',
+    'TMP_BSC_DIR'        : '@TMP_BSC_DIR@',
+    'TMP_XILINX_DIR'     : '@TMP_XILINX_DIR@',
+    'WORKSPACE_ROOT'     : '@WORKSPACE_ROOT@',
+}
+
+# Propagate environment from external state
+Import('env')
+env = env.Clone(DEFS = defs)
+
+env['DEFS']['ROOT_DIR_HW_MODEL'] = env['DEFS']['ROOT_DIR_HW'] + '/' + \
+                                   env['DEFS']['ROOT_DIR_MODEL'];
+env['DEFS']['ROOT_DIR_SW_MODEL'] = env['DEFS']['ROOT_DIR_SW'] + '/' + \
+                                   env['DEFS']['ROOT_DIR_MODEL'];
+
+
+############################################################################
+############################################################################
+##
+## Build rules
+##
+############################################################################
+############################################################################
+
+APM_NAME = env['DEFS']['APM_NAME']
+
+
+############################################################################
+##
+## Rules for building a Xilinx bit image
+##
+############################################################################
+
+TMP_XILINX_DIR = env['DEFS']['TMP_XILINX_DIR']
+
+moduleList = ModuleList.ModuleList(env, defs['MODULE_LIST'], ARGUMENTS, COMMAND_LINE_TARGETS)
+
+# Store some global state describing the build in model.
+model.env = env
+model.moduleList = moduleList
+
+# rootDir can be relevant when the SConscript file is in a subdirectory below
+# the SConstruct file.
+model.rootDir = env.Dir('.')
+
+# Generally we detect build failures using standard SCons mechanisms.  Timing
+# closure failure is different since we it remains useful for the build to
+# complete.  We flag timing failure outside the build dependence hierarchy.
+#
+# model.nonFatalFailures is a list of failed target files for which the
+# build continues.  Entries should be strings that are filenames with
+# extensions the can be detected by print_build_failures() below.
+model.nonFatalFailures = []
+
+# we will build whatever the user wants us to build
+build_pipeline.Build(moduleList)
+
+
+##
+## Clean up a few extra files not described in the build rules
+##
+if env.GetOption('clean'):
+    os.system('cd ' + TMP_XILINX_DIR + '; rm -f ' + APM_NAME + '*')
+    os.system('rm -f APM_NAME')
+
+############################################################################
+############################################################################
+##
+## Create build status file on exit
+##
+############################################################################
+############################################################################
+
+def print_build_failures():
+    from SCons.Script import GetBuildFailures
+
+    error_list = { ".o"         : "1 - Software failed",
+                    ".so"       : "1 - Software failed",
+                    ".exe"      : "1 - Software failed",
+                    ".bo"       : "2 - BSC failed",
+                    ".ngc"      : "3 - XST failed",
+                    ".edf"      : "3 - Synplify failed",
+                    ".ngd"      : "4 - NGD failed",
+                    ".ncd"      : "5 - MAP failed",
+                    ".errinfo"  : "6 - PAR timing failed",
+                    ".bit"      : "7 - Bitgen failed",
+                    ".download" : "8 - FPGA Loader failed"
+                  }
+
+    # default status file
+    try:
+        file_name = 'build'
+        if(moduleList.isDependsBuild):
+            file_name = 'depends'
+        a_file = open(file_name + '.status', 'w')
+    except IOError:
+        return()
+
+    success = True
+
+    # Turn GetBuildFailures objects into a list of strings
+    failures = [str(bf.node) for bf in GetBuildFailures()]
+
+    # Add non-fatail failures to the list
+    failures += model.nonFatalFailures
+
+    for bf in failures:
+        success = False
+
+        #  determine the type of erroneous node by its extension
+        error_node = os.path.splitext(bf)[1]
+        if error_node in error_list:
+            a_file.write(error_list[error_node] + " : " + bf + "\n")
+        else:
+            a_file.write("Unknown fail" + " : " + bf + "\n")
+
+    if success:
+        a_file.write("0 - SUCCESS\n")
+
+    a_file.close()
+
+atexit.register(print_build_failures)
+
+env.Alias('depends-init', moduleList.topDependsInit)
+
+top = moduleList.topDependency
+Return('top')

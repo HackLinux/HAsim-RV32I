@@ -1,0 +1,21 @@
+service STATS
+{
+
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+        method Command(in UINT8[8] cmd);
+    };
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method NodeInfo(in UINT32[32] desc);
+
+        method ReportStat(in UINT32[32] desc,
+                          in UINT32[32] pos,
+                          in UINT32[32] value);
+
+        // Response from HW command service.  "cmd" is the value passed to
+        // the command service.
+        method Ack(in UINT8[8] cmd);
+    };
+};

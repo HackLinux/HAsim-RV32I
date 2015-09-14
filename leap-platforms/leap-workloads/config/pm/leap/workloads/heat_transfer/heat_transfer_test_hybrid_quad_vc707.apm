@@ -1,0 +1,85 @@
+
+[Global]
+SaveParameters=0
+Description=has strange module alingments
+File=heat_transfer_test_hybrid_quad_vc707
+Version=2.2
+Name=Heat Transfer Quad FPGA Synthesis Test 
+DefaultBenchmark=
+Type=Leap
+Class=Asim::Model
+DefaultRunOpts=
+RootName=HW/SW Hybrid Multifpga Project Foundation
+RootProvides=model
+
+[Model]
+DefaultAttributes=function_as_boundary traffic_light demo connected slave hybrid project exe
+model=HW/SW Hybrid Multifpga Project Foundation
+
+[HW/SW Hybrid Multifpga Project Foundation/Requires]
+connected_application=Heat Transfer Test Connected Application
+environment_description=VC707 Quad FPGA Environment (SMA)
+build_pipeline=LIM Compiler Pipeline
+fpga_mapping=Heat Transfer Test Mapping for Quad FPGA
+
+[HW/SW Hybrid Multifpga Project Foundation]
+File=modules/leap/build-support/project/project-multifpga.awb
+Packagehint=leap-multifpga
+
+[LIM Compiler Pipeline]
+File=config/pm/leap/submodels/pipelines/build-pipeline-lim.apm
+Packagehint=leap-multifpga
+
+[Heat Transfer Test Remote Module 1]
+File=modules/heat_transfer/heat-transfer-remote1.awb
+Packagehint=leap-workloads
+
+
+
+[Heat Transfer System/Requires]
+heat_transfer_remote2=Heat Transfer Test Remote Module 2
+heat_transfer_remote3=Heat Transfer Test Remote Module 3
+heat_transfer_control=Heat Transfer Test Controller Module
+heat_transfer_remote1=Heat Transfer Test Remote Module 1
+heat_transfer_local=Heat Transfer Test Local Module
+heat_transfer_common=Heat Transfer Test Common
+
+[Heat Transfer Test Controller Module]
+File=modules/heat_transfer/heat-transfer-control.awb
+Packagehint=leap-workloads
+
+[Heat Transfer Test Remote Module 3]
+File=modules/heat_transfer/heat-transfer-remote3.awb
+Packagehint=leap-workloads
+
+
+[Heat Transfer Test Remote Module 2]
+File=modules/heat_transfer/heat-transfer-remote2.awb
+Packagehint=leap-workloads
+
+[Heat Transfer System]
+File=modules/heat_transfer/heat-transfer.awb
+Packagehint=leap-workloads
+
+[Heat Transfer Test Local Module]
+File=modules/heat_transfer/heat-transfer-local.awb
+Packagehint=leap-workloads
+
+[Heat Transfer Test Common]
+File=modules/heat_transfer/heat-transfer-common.awb
+Packagehint=leap-workloads
+
+[Heat Transfer Test Mapping for Quad FPGA]
+File=modules/heat_transfer/fpga-mapping-quad.awb
+Packagehint=leap-workloads
+
+[VC707 Quad FPGA Environment (SMA)]
+File=modules/leap-platforms/fpga-environments/vc707/vc707_quad_env.awb
+Packagehint=leap-multifpga
+
+[Heat Transfer Test Connected Application]
+File=modules/heat_transfer/connected_application/connected-application-test.awb
+Packagehint=leap-workloads
+
+[Heat Transfer Test Connected Application/Requires]
+heat_transfer_system=Heat Transfer System

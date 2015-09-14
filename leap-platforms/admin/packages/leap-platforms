@@ -1,0 +1,12 @@
+
+[Global]
+Buildorder=1000
+Version=1
+Lock=asim-platforms
+Description=Description of platforms
+Name=leap-platforms
+Tag=v14.08
+Prerelease=1
+CSN=CSN-leap-platforms-749
+Dependencies=leap/v13.06
+Sourceurl=http://asim.csail.mit.edu/redmine/projects/leap-platforms/repository/entry/trunk/

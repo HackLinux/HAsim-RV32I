@@ -1,0 +1,148 @@
+#!/bin/sh -p
+
+##
+## Configuration script for Xilinx VC707 FPGA boards.
+##
+
+# Keep user from messing with PATH when running as root
+PATH=/sbin:/bin:/usr/sbin:/usr/bin
+export PATH
+unset LD_LIBRARY_PATH
+
+echo $*
+function usage()
+{
+    echo "Usage: $0 <program|activate> <device id> <driver>"
+    exit 1
+}
+
+if [ $# -ne 3 ]; then
+    usage
+fi
+
+arg_command="$1"
+arg_devid="$2"
+arg_driver="$3"
+
+# Hot-plug controller for enabling/disabling while programming
+bus_id=`leap-fpga-ctrl --dev=${arg_devid} --getconfig=bus_id`
+pci_devname="^${bus_id}"
+case "$bus_id" in
+  "0000:04:00.0")
+    pci_enable="/sys/devices/pci0000:00/0000:00:02.0/rescan"
+    pci_disable="/sys/devices/pci0000:00/0000:00:02.0/${bus_id}/remove"
+    ;;
+  "0000:05:00.0")
+    pci_enable="/sys/devices/pci0000:00/0000:00:03.0/rescan"
+    pci_disable="/sys/devices/pci0000:00/0000:00:03.0/${bus_id}/remove"
+    ;;
+  "0000:07:00.0")
+    pci_enable="/sys/devices/pci0000:00/0000:00:07.0/rescan"
+    pci_disable="/sys/devices/pci0000:00/0000:00:07.0/${bus_id}/remove"
+    ;;
+  "0000:83:00.0")
+    pci_enable="/sys/devices/pci0000:80/0000:80:03.0/rescan"
+    pci_disable="/sys/devices/pci0000:80/0000:80:03.0/${bus_id}/remove"
+    ;;
+  *)
+    echo "Unexpected PCI bus id: $bus_id"
+    exit 1
+esac
+
+# Kernel module
+kernel_module_path="/usr/share/leap/drivers/bluenoc.ko"
+kernel_module_name=`basename $kernel_module_path | sed -e 's/.[^.]*$//'`
+
+case "$arg_command" in
+  program)
+    ##
+    ## Prepare the FPGA for programming.  Turns off the PCIe bus.
+    ##
+
+    # No need to rmmod the BlueNoC driver.  It will handle the device
+    # disappearing and reappering correctly.
+    if [ -f ${pci_disable} ]; then
+        echo "Disabling PCIe device..."
+        echo 1 > $pci_disable
+    fi
+
+    # Let the bus settle
+    sleep 1
+
+    echo "Programming device: ${arg_driver}"
+
+    ;;
+  deactivate) 
+
+    ##
+    ## load into the system following programming.  Turn on the PCIe bus and load
+    ## the kernel driver.
+    ##
+
+    # Let the bus settle
+    sleep 2
+
+    echo "Enabling PCIe device..."
+    echo 1 > $pci_enable
+
+    # Wait for PCIe physical device to appear
+    trips=0
+    while [ ! -d "/sys/bus/pci/devices/${bus_id}" ]; do
+        trips=`expr $trips + 1`
+        if [ $trips -eq 10 ]; then
+            echo "  Trying again..."
+            echo 1 > $pci_enable
+        fi
+        if [ $trips -eq 15 ]; then
+            echo "PCIe rescan failure"
+            exit 1
+        fi
+        sleep 1
+    done
+
+    # Load the kernel driver if it isn't there already
+    if [ "`grep "^${kernel_module_name} " /proc/modules`" = "" ]; then
+        echo "Loading kernel driver..."
+        insmod $kernel_module_path
+    fi
+
+    # Wait for device to appear
+    trips=0
+    while [ ! -c ${arg_driver} ]; do
+        trips=`expr $trips + 1`
+        if [ $trips -eq 15 ]; then
+            echo "Device driver ${kernel_module_path} load failure"
+            exit 1
+        fi
+        sleep 1
+    done
+
+    # Restore all the configuration state from a saved copy.  This copy was
+    # saved by programming the FPGA, rebooting, loading the driver and then
+    # copying /sys/bus/.../config to /usr/share/leap/state.
+    cp /usr/share/leap/state/${bus_id}_config /sys/bus/pci/devices/${bus_id}/config
+
+
+    sleep 2
+
+    # reactivate the driver by calling some ioctls on it.                       
+    /usr/local/bin/bluenoc-ioctl ${arg_driver} "deactivate"
+
+    sleep 2
+
+    # Give user access to the device
+    echo "loaded device: VC707 ${arg_devid} ${arg_driver}"
+    ;;
+
+  activate)
+
+    sleep 2
+
+    /usr/local/bin/bluenoc-ioctl ${arg_driver} "activate"
+
+    sleep 2
+
+    echo "Activating device: VC707 ${arg_devid} ${arg_driver}"
+    ;;
+
+esac

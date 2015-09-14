@@ -1,0 +1,15 @@
+%name Multi-Core Chip
+%desc Multi-Core Chip 
+
+%provides hasim_chip
+
+%requires hasim_core 
+%requires hasim_uncore
+%requires hasim_chip_topology
+%requires chip_base_types
+
+
+%attributes hasim model chip
+
+%public multi-core-chip.bsv
+%public multi-core-chip.h

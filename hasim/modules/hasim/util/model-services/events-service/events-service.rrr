@@ -1,0 +1,24 @@
+service EVENTS
+{
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+        // 0 to disable, 1 to enable
+        method EnableEvents(in UINT8[8] enable);
+    };
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method LogInit(in UINT16[16] event_id,
+                       in UINT16[16] max_event_iid);
+
+        method LogEvent(in UINT16[16] event_id,
+                        in UINT16[16] event_iid,
+                        in UINT32[32] event_data,
+                        in UINT8[8] model_cc_delta);
+
+        // Note cycles passing with no event
+        method LogCycles(in UINT16[16] event_id,
+                         in UINT16[16] event_iid,
+                         in UINT8[8] model_cc_delta);
+    };
+};

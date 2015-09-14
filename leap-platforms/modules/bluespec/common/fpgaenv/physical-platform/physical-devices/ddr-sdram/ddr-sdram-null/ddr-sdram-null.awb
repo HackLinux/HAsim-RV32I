@@ -1,0 +1,12 @@
+%name Null DDR SDRAM Physical Device
+%desc Null DDR SDRAM Physical Device
+
+%provides ddr_sdram_device
+%requires ddr_sdram_definitions
+
+%notes README
+
+%public ddr-sdram-null.bsv
+
+
+

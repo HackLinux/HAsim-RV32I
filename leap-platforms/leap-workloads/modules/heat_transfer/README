@@ -1,0 +1,49 @@
+
+===============================================================================
+
+     Heat Transfer Test Correctness Check
+
+===============================================================================
+
+The heat transfer benchmark has a correctness checking feature that is disabled 
+by default. With a default setting, the heat frame is initialized on hardware 
+and the result is not sent back to host for correctness check. 
+
+(1) Default setting: 
+
+    Parameters: HEAT_TRANSFER_HARDWARE_INIT=1 HEAT_TRANSFER_RESULT_CHECK=0
+    Benchmark: null.cfg
+
+(2) To initialize heat frames from files (without correctness check):
+
+    Parameters: HEAT_TRANSFER_HARDWARE_INIT=0 HEAT_TRANSFER_RESULT_CHECK=0
+    Benchmark: heat_transfer_32x32.cfg
+               heat_transfer_64x64.cfg
+               heat_transfer_128x128.cfg
+               heat_transfer_256x256.cfg
+               heat_transfer_512x512.cfg
+               heat_transfer_1024x1024.cfg
+
+
+(3) To perform correctness check (heat frames need to be initialized from files):
+
+    Parameters: HEAT_TRANSFER_HARDWARE_INIT=0 HEAT_TRANSFER_RESULT_CHECK=1
+    Benchmark: heat_transfer_32x32.cfg
+               heat_transfer_64x64.cfg
+               heat_transfer_128x128.cfg
+               heat_transfer_256x256.cfg
+               heat_transfer_512x512.cfg
+               heat_transfer_1024x1024.cfg
+
+    Run command: the dynamic parameter settings need to match the benchmark 
+                 frame size. 
+
+    For example, for heat_transfer_1024x1024.cfg, execute the following run command:
+    ./run --param HEAT_TRANSFER_TEST_X_POINTS=1024 --param HEAT_TRANSFER_TEST_Y_POINTS=1024
+
+(4) To generate more test cases: (ex: different frame sizes that are not provided)
+    
+    Use the heatFrameGen.cpp under the simulator directory to generate new frames 
+    (and the golden answers).
+
+

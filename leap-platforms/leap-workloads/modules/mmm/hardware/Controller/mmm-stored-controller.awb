@@ -1,0 +1,11 @@
+%name Matrix matrix controller (Stored Program)
+%desc This controller stores a buffer of instructions 
+
+%attributes slave connected hybrid
+
+%provides mmm_controller
+
+%public  StoredController.bsv
+%public  StoredController.rrr
+
+

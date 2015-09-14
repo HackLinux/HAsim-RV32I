@@ -1,0 +1,10 @@
+%name m5 Hybrid Memory
+%desc m5 Hybrid Memory
+
+%provides funcp_simulated_memory
+%requires m5_hasim_base
+
+%sources -v PUBLIC  m5-memory.h
+%sources -v PRIVATE m5-memory.cpp
+
+%param PROGRAM_START_ADDR 0             "Address where model should start fetching"

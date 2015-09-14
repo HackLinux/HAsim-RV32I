@@ -1,0 +1,10 @@
+%name Matrix matrix functional unit network
+%desc Matrix matrix multiplication
+
+%attributes slave connected hybrid
+
+%provides mmm_functional_unit_network
+
+%public  SimpleFUNetwork.bsv
+
+

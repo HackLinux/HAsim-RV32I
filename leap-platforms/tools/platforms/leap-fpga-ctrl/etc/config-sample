@@ -1,0 +1,38 @@
+##
+## Configuration file describing FPGA devices
+##
+
+# Device names must be unique but are otherwise just for display
+[HTG-Virtex5-PCIe.0]
+
+# Class is used to match a model configuration with a hardware device type
+class = HTG-V5-PCIe
+
+# Specifies whether to look for device specific script in /usr/share/leap/scripts/<class>
+# This field must be specified for all devices.
+# Allowed values: yes or no
+has_control_script = yes
+
+# The device driver's permissions will be modified to permit write access
+# by the user after a successful reservation
+dev = /dev/pchnl
+
+# Optional bus ID used by control script to identify the physical device
+bus_id = 83:00.0
+
+# Optional programming cable ID (in case there are multiple programming cables)
+prog_cable_id = -target "xilinx_platformusb frequency=12000000 esn=00001097AA2F01"
+
+[VC707.0]
+class = VC707
+has_control_script = yes
+bus_id = 0000:04:00.0
+prog_cable_id = -target "digilent_plugin frequency=30000000 device=SN:210201234286"
+dev = /dev/bluenoc_0000:04:00.0
+
+[VC707.1]
+class = VC707
+has_control_script = yes
+bus_id = 0000:83:00.0
+prog_cable_id = -target "digilent_plugin frequency=30000000 device=SN:210201258321"
+dev = /dev/bluenoc_0000:83:00.0

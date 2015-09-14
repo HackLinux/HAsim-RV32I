@@ -1,0 +1,50 @@
+service COMMANDS
+{
+    server hw (bsv, connection) <- sw (cpp, method)
+    {
+        method Run(in UINT8[8] dummy, out UINT8[8] ack);
+        method Pause(in UINT8[8] dummy, out UINT8[8] ack);
+        method Resume(in UINT8[8] dummy, out UINT8[8] ack);
+
+        method Sync(in UINT8[8] dummy, out UINT8[8] ack);
+        method IsSynced(in UINT8[8] dummy, out UINT8[8] isSynced);
+
+        method SetEndModelCycle(in UINT64[64] modelCycle);
+
+        method EnableContext(in UINT32[32] ctxId);
+        method DisableContext(in UINT32[32] ctxId);
+
+        // Scan state (for debugging)
+        method Scan(in UINT8[8] dummy);
+
+        // Test throughput of each model stage, individually.
+        method TestThroughput(in UINT8[8] dummy);
+    };
+
+    server sw (cpp, method) <- hw (bsv, connection)
+    {
+        method EndSim(in UINT8[8] success);
+
+        method ModelHeartbeat(in UINT32[32] ctxId,
+                              in UINT64[64] fpga_cycles,
+                              in UINT32[32] model_cycles,
+                              in UINT32[32] instr_commits);
+
+        // Ping from the hardware, used to detect deadlocks
+        method FPGAHeartbeat(in UINT8[8] dummy);
+
+        // Data stream resulting from Scan() request
+        //   flag bit 0: "end of message"
+        //   flag bit 1: "0: LC_ScanData / 1: LC_ScanRunning"
+        method ScanData(in UINT8[8] data, in UINT8[8] flags);
+
+        // Data stram from TestThroughput() request
+        //   flag bit 0: "end of message"
+        method ThroughputData(in UINT16[16] data, in UINT8[8] flags);
+
+        // Sent after either scan or throughput test is done.  Must be
+        // last method declared since the last slot has lowest priority.
+        // This guarantees all data arrive before the done message.
+        method ScanDone(in UINT8[8] test);
+    };
+};

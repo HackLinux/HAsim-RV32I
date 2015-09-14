@@ -1,0 +1,12 @@
+%name Differential Crystal Clocks Device from Wires
+%desc Differential Crystal Clocks Device from Wires
+
+%provides clocks_device
+%notes README
+
+%sources -t BSV -v PUBLIC  differential-clocks-device.bsv
+
+%param --global MODEL_CLOCK_FREQ 50  "Desired model clock frequency (integer)."
+
+%param CRYSTAL_CLOCK_FREQ 100 "Input (Crystal) Clock Frequency"
+%param --global RESET_ACTIVE_HIGH      0   "Reset active level polarity: 0 - negative, 1 - positive."

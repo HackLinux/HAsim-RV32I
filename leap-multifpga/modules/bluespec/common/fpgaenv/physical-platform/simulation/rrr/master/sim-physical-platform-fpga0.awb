@@ -1,0 +1,16 @@
+
+%name FPGA0 Simulation Physical Platform
+%desc FPGA0 Simulation Physical Platform
+
+%provides physical_platform
+
+%requires clocks_device unix_pipe_device physical_platform_utils simulation_communication_device
+
+%sources --t BSV --v PUBLIC  sim-physical-platform-fpga0.bsv
+%sources --t H   --v PUBLIC  sim-physical-platform-fpga0.h
+%sources --t CPP --v PRIVATE sim-physical-platform-fpga0.cpp
+%sources --t BSH --v PUBLIC  sim-physical-platform-fpga0.bsh
+
+%param --global MY_ID 0 "Simulator Write Port"
+%param --global NUM_FPGA  4 "Simulator Read Port"
+
